@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 
 const features = [
-  {name: "Company",icons:"/icons/Company.png", link:"/CompanyPage"},
+
+   {name:"Company",icon:"/icons/Company.png",link:"/CompanyPage"},
   {name:"User",icon:"/icons/user.png",link:"/UserPage"},
   { name: "Appointment", icon: "/icons/Appointment.png", link: "/appointment" },
   { name: "Consultation", icon: "/icons/Analytics.png", link: "/Consultation" },
