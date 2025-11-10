@@ -7,7 +7,7 @@ const AddUser = () => {
   const location = useLocation();
 
   const userData = location.state?.user || null;
-  const mode = location.state?.mode || "add"; // "add" | "edit" | "view"
+  const mode = location.state?.mode || "add";        
   const readOnly = mode === "view";
   const token = localStorage.getItem("token");
 
@@ -240,7 +240,7 @@ const AddUser = () => {
 
   // ✅ JSX layout
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-8xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">
         {mode === "edit"
           ? "Edit User"
@@ -271,6 +271,25 @@ const AddUser = () => {
           </select>
         </div>
       )}
+      
+      {/* Badge for selected user type */}
+      {userType && userType !== "Doctor" && (
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-3">
+            {/* <h2 className="text-xl font-semibold text-gray-800">User Type:</h2> */}
+            <span className="px-8 py-3 bg-[#7E4363] text-white rounded-full text-2xl font-medium shadow">
+              {userType}
+            </span>
+          </div>
+          <button
+            onClick={() => setUserType("")}
+            className="text-sm text-[#7E4363] underline hover:text-[#9b5778]"
+          >
+            Change User Type
+          </button>
+        </div>
+      )}
+
 
       {userType && (
         <form
@@ -278,100 +297,104 @@ const AddUser = () => {
           className="bg-[#F7DACD] p-6 rounded-xl space-y-8"
         >
           {/* Company */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+  {/* Company */}
+  <div>
+    <label className="block mb-1 font-medium">Company*</label>
+    <select
+      name="company"
+      value={formData.company}
+      onChange={handleChange}
+      disabled={readOnly}
+      className="w-full border p-3 rounded-lg"
+    >
+      <option value="">Select Company</option>
+      {companies.map(c => (
+        <option key={c.id} value={c.id}>
+          {c.name}
+        </option>
+      ))}
+    </select>
+    {errors.company && (
+      <p className="text-red-500 text-sm mt-1">{errors.company}</p>
+    )}
+  </div>
 
-          <div>
-            <label className="block mb-1 font-medium">Company*</label>
-            <select
-              name="company"
-              value={formData.company}
-              onChange={handleChange}
-              disabled={readOnly}
-              className="w-full border p-3 rounded-lg"
-            >
-              <option value="">Select Company</option>
-              {companies.map(c => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-            {errors.company && (
-              <p className="text-red-500 text-sm mt-1">{errors.company}</p>
-            )}
-          </div>
+  {/* Name */}
+  <div>
+    <label className="block mb-1 font-medium">Name*</label>
+    <input
+      type="text"
+      name="name"
+      value={formData.name}
+      onChange={handleChange}
+      readOnly={readOnly}
+      className="w-full border p-3 rounded-lg"
+    />
+    {errors.name && (
+      <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+    )}
+  </div>
 
-          {/* Name, Gender, DOB */}
-          <div className="grid md:grid-cols-3 gap-6">
-            <div>
-              <label className="block mb-1 font-medium">Name*</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                readOnly={readOnly} 
-                className="w-full border p-3 rounded-lg"
-              />
-              {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-              )}
-            </div>
+  {/* Gender */}
+  <div>
+    <label className="block mb-1 font-medium">Gender*</label>
+    <select
+      name="gender"
+      value={formData.gender}
+      onChange={handleChange}
+      disabled={readOnly}
+      className="w-full border p-3 rounded-lg"
+    >
+      <option value="">Select</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+      <option value="Others">Others</option>
+    </select>
+    {errors.gender && (
+      <p className="text-red-500 text-sm mt-1">{errors.gender}</p>
+    )}
+  </div>
 
-            <div>
-              <label className="block mb-1 font-medium">Gender*</label>
-              <select
-                name="gender"
-                value={formData.gender}
-                onChange={handleChange}
-                disabled={readOnly}
-                className="w-full border p-3 rounded-lg"
-              >
-                <option value="">Select</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Others">Others</option>
-              </select>
-              {errors.gender && (
-                <p className="text-red-500 text-sm mt-1">{errors.gender}</p>
-              )}
-            </div>
-          </div>
+  {/* Date of Birth */}
+  <div>
+    <label className="block mb-1 font-medium">Date of Birth*</label>
+    <input
+      type="date"
+      name="dob"
+      value={formData.dob}
+      onChange={handleChange}
+      readOnly={readOnly}
+      className="w-full border p-3 rounded-lg"
+    />
+  </div>
 
-            <div>
-              <label className="block mb-1 font-medium">Date of Birth*</label>
-              <input
-                type="date"
-                name="dob"
-                value={formData.dob}
-                onChange={handleChange}
-                readOnly={readOnly} 
-                className="w-full border p-3 rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block mb-1 font-medium">Age*</label>
-              <input
-                type="number"
-                name="age"
-                value={formData.age}
-                onChange={handleChange}
-                readOnly={readOnly} 
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#7E4363] outline-none"
-              />
-            </div>
-            <div>
-              <label className="block mb-1 font-medium">Blood Group</label>
-              <input
-                type="text"
-                name="bloodGroup"
-                value={formData.bloodGroup}
-                onChange={handleChange}
-                readOnly={readOnly} 
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#7E4363] outline-none"
-              />
-            </div>
-          </div>
+  {/* Age */}
+  <div>
+    <label className="block mb-1 font-medium">Age*</label>
+    <input
+      type="number"
+      name="age"
+      value={formData.age}
+      onChange={handleChange}
+      readOnly={readOnly}
+      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#7E4363] outline-none"
+    />
+  </div>
+
+  {/* Blood Group */}
+  <div>
+    <label className="block mb-1 font-medium">Blood Group</label>
+    <input
+      type="text"
+      name="bloodGroup"
+      value={formData.bloodGroup}
+      onChange={handleChange}
+      readOnly={readOnly}
+      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#7E4363] outline-none"
+    />
+  </div>
+</div>
 
           {/* Row 3 */}
           <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-6">
@@ -488,108 +511,102 @@ const AddUser = () => {
           </div>
 
           {/* row 5 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-            <div>
-              <label className="block mb-1 font-medium">Password*</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  readOnly={readOnly} 
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#7E4363] outline-none pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-gray-500"
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
-              {formData.password && (
-                <p
-                  className={`mt-1 text-sm ${
-                    checkPasswordStrength(formData.password) === "Strong"
-                      ? "text-green-600"
-                      : checkPasswordStrength(formData.password) === "Medium"
-                      ? "text-yellow-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  Password Strength: {checkPasswordStrength(formData.password)}
-                </p>
-              )}
-            </div>
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center w-full">
+  {/* Password */}
+  <div>
+    <label className="block mb-1 font-medium">Password*</label>
+    <div className="relative">
+      <input
+        type={showPassword ? "text" : "password"}
+        name="password"
+        value={formData.password}
+        onChange={handleChange}
+        readOnly={readOnly}
+        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#7E4363] outline-none pr-10"
+      />
+      <button
+        type="button"
+        onClick={() => setShowPassword(!showPassword)}
+        className="absolute right-3 top-3 text-gray-500"
+      >
+        {showPassword ? <FaEyeSlash /> : <FaEye />}
+      </button>
+    </div>
+    {formData.password && (
+      <p
+        className={`mt-1 text-sm ${
+          checkPasswordStrength(formData.password) === "Strong"
+            ? "text-green-600"
+            : checkPasswordStrength(formData.password) === "Medium"
+            ? "text-yellow-600"
+            : "text-red-600"
+        }`}
+      >
+        Password Strength: {checkPasswordStrength(formData.password)}
+      </p>
+    )}
+  </div>
 
-            <div>
-              <label className="block mb-1 font-medium">Static IP</label>
-              <input
-                type="text"
-                name="staticIP"
-                value={formData.staticIP}
-                onChange={handleChange}
-                readOnly={readOnly} 
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#7E4363] outline-none"
-              />
-            </div>
+  {/* Static IP */}
+  <div>
+    <label className="block mb-1 font-medium">Static IP</label>
+    <input
+      type="text"
+      name="staticIP"
+      value={formData.staticIP}
+      onChange={handleChange}
+      readOnly={readOnly}
+      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#7E4363] outline-none"
+    />
+  </div>
 
-            {/* Status Toggle */}
-            <div className="flex items-center gap-4">
-              <label className="font-medium">Status:</label>
-              <button
-                type="button"
-                onClick={handleToggleStatus}
-                disabled={readOnly}
-                className={`relative inline-flex h-6 w-12 items-center rounded-full transition ${
-                  formData.status ? "bg-green-500" : "bg-gray-400"
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                    formData.status ? "translate-x-6" : "translate-x-1"
-                  }`}
-                />
-              </button>
-              <span
-                className={`text-sm ${
-                  formData.status ? "text-green-700" : "text-gray-600"
-                }`}
-              >
-                {formData.status ? "Active" : "Inactive"}
-              </span>
-            </div>
+  {/* Status Toggle */}
+  <div className="flex flex-col gap-2">
+    <label className="font-medium">Status:</label>
+    <button
+      type="button"
+      onClick={handleToggleStatus}
+      disabled={readOnly}
+      className={`relative inline-flex h-6 w-12 items-center rounded-full transition ${
+        formData.status ? "bg-[#7E4363]" : "bg-gray-400"
+      }`}
+    >
+      <span
+        className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+          formData.status ? "translate-x-6" : "translate-x-1"
+        }`}
+      />
+    </button>
+    <span
+      className={`text-sm ${
+        formData.status ? "text-[#7E4363]" : "text-gray-600"
+      }`}
+    >
+      {formData.status ? "Active" : "Inactive"}
+    </span>
+  </div>
 
-            {!readOnly && (
-              <div className="flex justify-end">
-                {/* <button
-                  type="submit"
-                  className="px-6 py-3 bg-[#7E4363] text-white rounded-lg hover:bg-[#9b5778]"
-                >
-                  {mode === "edit" ? "Update" : "Save"} User
-                </button> */}
+  {/* Buttons aligned to the right */}
+  {!readOnly && (
+    <div className="col-span-1 md:col-span-3 flex justify-end mt-6 space-x-4">
+      <button
+        type="button"
+        onClick={() => navigate("/CompanyPage")}
+        className="px-4 py-2 bg-[#7E4363] text-white rounded-lg transition"
+      >
+        Cancel
+      </button>
 
-                <div className="flex justify-end mt-6 space-x-4">
-          <button
-            type="button"
-            onClick={() => navigate("/CompanyPage")}
-            className="px-4 py-2 border bg-[#7E4363] rounded-lg text-white hover:bg-gray-100"
-          >
-            Cancel
-          </button>
-          {!readOnly && (
-            <button
-              type="submit"
-              className="px-4 py-2 bg-[#7E4363] text-white rounded-lg hover:bg-[#9b5778]"
-            >
-              {userData ? "Update" : "Save"}
-            </button>
-          )}
-        </div>
-              </div>
-            )}
-          </div>
+      <button
+        type="submit"
+        className="px-4 py-2 bg-[#7E4363] text-white rounded-lg transition"
+      >
+        {userData ? "Update" : "Save"}
+      </button>
+    </div>
+  )}
+</div>
+
         </form>
       )}
     </div>

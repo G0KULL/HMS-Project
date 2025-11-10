@@ -25,6 +25,14 @@ const PatientInfo = () => {
     if (form) form.reset();
   };
 
+   // ✅ Navigation buttons
+  const tabs = [
+    { label: "Readings", path: "/Reading" },
+    { label: "Examination", path: "/examinationDoc" },
+    { label: "Case History", path: "/CaseHistory" },
+    { label: "Draw", path: "/Draw" },
+  ];
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="max-w-8xl mx-auto p-6 space-y-6">
@@ -32,33 +40,23 @@ const PatientInfo = () => {
 
     <PatientInfor/>
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-start space-x-4">
-          <Link
-            to="/reading"
-            className="border px-8 py-2 rounded-full font-bold text-2xl hover:bg-[#F7DACD] hover:text-white transition"
+     {/* tab */}
+      <div className="flex gap-4 justify-start mt-4">
+        {tabs.map((tab, index) => (
+          <button
+            key={index}
+            onClick={() => navigate(tab.path)}
+            className={`px-6 py-2 rounded-full font-medium shadow-md ${
+              window.location.pathname === tab.path
+                ? "bg-[#F7DACD]"
+                : "border border-gray-800 hover:bg-[#f4c4b2]"
+            }`}
           >
-            Readings
-          </Link>
-          <Link
-            to="/examinationDoc"
-            className="border px-8 py-2 rounded-full font-bold text-2xl hover:bg-[#F7DACD] hover:text-white transition"
-          >
-            Examination
-          </Link>
-          <Link
-            to="/CaseHistory"
-            className="border px-8 py-2 rounded-full font-bold text-2xl hover:bg-[#F7DACD] hover:text-white transition"
-          >
-            Case History
-          </Link>
-          <Link
-            to="/Draw"
-            className="border px-8 py-2 rounded-full font-bold text-2xl hover:bg-[#F7DACD] hover:text-white transition"
-          >
-            Draw
-          </Link>
-        </div>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+       
 
         <Eye/>
 

@@ -99,7 +99,7 @@ class User(Base):
     company_id = Column(Integer, ForeignKey("companies.id"), nullable=False)
 
     company = relationship("Company", back_populates="users")
-    doctor = relationship("Doctor", back_populates="user", uselist=False)
+    doctor = relationship("Doctor", back_populates="user", uselist=False, cascade="all, delete-orphan")
     optometrys = relationship(
         "Optometry",
         back_populates="users",

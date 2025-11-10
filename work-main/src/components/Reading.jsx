@@ -33,9 +33,10 @@ const PatientInfo = () => {
   const token = localStorage.getItem("token");
 
   // Map tabs to routes
+  // ✅ Navigation buttons
   const tabs = [
-    { label: "Readings", path: "/Reading" },
-    { label: "Examination", path: "/ExaminationDoc" },
+    { label: "Readings", path: "/reading" },
+    { label: "Examination", path: "/examinationDoc" },
     { label: "Case History", path: "/CaseHistory" },
     { label: "Draw", path: "/Draw" },
   ];
@@ -245,7 +246,7 @@ const PatientInfo = () => {
   // Handle form submission (disabled in view-only mode)
   const handleSubmit = (e) => {
     e.preventDefault();
-    // In view-only mode, just show popup
+   
     setShowPopup(true);
   };
 
@@ -301,21 +302,20 @@ const PatientInfo = () => {
         )}
 
       {/* tab */}
-      <div className="flex justify-start space-x-4">
-        {tabs.map((tab) => {
-          const isActive = location.pathname === tab.path; //  check active tab
-          return (
-            <p
-              key={tab.label}
-              onClick={() => navigate(tab.path)}
-              className={`border px-8 py-2 rounded-full font-bold text-2xl cursor-pointer transition
-                ${isActive ? "bg-[#F7DACD] text-white" : "hover:bg-[#F7DACD] hover:text-white"}
-              `}
-            >
-              {tab.label}
-            </p>
-          );
-        })}
+      <div className="flex gap-4 justify-start mt-4">
+        {tabs.map((tab, index) => (
+          <button
+            key={index}
+            onClick={() => navigate(tab.path)}
+            className={`px-6 py-2 rounded-full font-medium shadow-md ${
+              window.location.pathname === tab.path
+                ? "bg-[#F7DACD]"
+                : "border border-gray-800 hover:bg-[#f4c4b2]"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Buttons Section */}

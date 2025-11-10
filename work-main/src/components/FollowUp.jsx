@@ -98,7 +98,7 @@ export default function FollowUp() {
               </div>
 
               {/* Options */}
-              <label className="flex items-center gap-2 px-3 py-1 text-sm rounded-full bg-[#48D56D] text-white font-medium shadow cursor-pointer hover:bg-green-600 transition">
+              <label className="flex items-center gap-2 px-3 py-1 text-sm rounded-full bg-[#7E4363]  text-white font-medium shadow cursor-pointer hover:bg-green-600 transition">
                 <input
                   type="checkbox"
                   name="dilatation"
@@ -109,7 +109,7 @@ export default function FollowUp() {
                 <span>Dilatation</span>
               </label>
 
-              <label className="flex items-center gap-2 px-3 py-1 text-sm rounded-full bg-[#48D56D] text-white font-medium shadow cursor-pointer hover:bg-green-600 transition">
+              <label className="flex items-center gap-2 px-3 py-1 text-sm rounded-full bg-[#7E4363]  text-white font-medium shadow cursor-pointer hover:bg-green-600 transition">
                 <input
                   type="checkbox"
                   name="rerefraction"
@@ -120,7 +120,7 @@ export default function FollowUp() {
                 <span>Re refraction</span>
               </label>
 
-              <label className="flex items-center gap-2 px-3 py-1 text-sm rounded-full bg-[#48D56D] text-white font-medium shadow cursor-pointer hover:bg-green-600 transition">
+              <label className="flex items-center gap-2 px-2 py-1 text-sm rounded-full bg-[#7E4363]  text-white font-medium shadow cursor-pointer hover:bg-green-600 transition">
                 <input
                   type="checkbox"
                   name="highRiskPatient"
@@ -131,7 +131,7 @@ export default function FollowUp() {
                 <span>High risk patient</span>
               </label>
 
-              <label className="flex items-center gap-2 px-3 py-1 text-sm rounded-full bg-[#48D56D] text-white font-medium shadow cursor-pointer hover:bg-green-600 transition">
+              <label className="flex items-center gap-2 px-3 py-1 text-sm rounded-full bg-[#7E4363]  text-white font-medium shadow cursor-pointer hover:bg-green-600 transition">
                 <input
                   type="checkbox"
                   name="fileClose"
@@ -170,21 +170,21 @@ export default function FollowUp() {
           <div className="flex justify-end gap-6">
             <button
               type="button"
-              className="px-6 py-2 rounded-full bg-[#48D56D] text-white hover:bg-green-600 transition"
+              className="px-6 py-2 rounded-full bg-[#7E4363]  text-white hover:bg-green-600 transition"
               onClick={() => console.log("Load clicked")}
             >
               Load
             </button>
             <button
               type="button"
-              className="px-6 py-2 rounded-full bg-[#48D56D] text-white hover:bg-green-600 transition"
+              className="px-6 py-2 rounded-full bg-[#7E4363]  text-white hover:bg-green-600 transition"
               onClick={() => console.log("Save clicked", formData)}
             >
               Save
             </button>
             <button
               type="submit"
-              className="px-6 py-2 rounded-full bg-[#48D56D] text-white hover:bg-green-600 transition"
+              className="px-6 py-2 rounded-full bg-[#7E4363]  text-white hover:bg-green-600 transition"
             >
               Submit
             </button>

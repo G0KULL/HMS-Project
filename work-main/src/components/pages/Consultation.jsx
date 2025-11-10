@@ -86,10 +86,10 @@ export default function Consultation() {
           "READY TO SEE": readyToSeeCount,
         }));
 
-        // 2️⃣ Get unique patient IDs
+        // 2️ Get unique patient IDs
         const patientIds = uniquePatientIds;
 
-        // 3️⃣ Fetch each patient's data
+        // 3Fetch each patient's data
         const patientPromises = patientIds.map(async (id) => {
           const res = await fetch(`${API_BASE}/patients/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -203,7 +203,7 @@ export default function Consultation() {
                 .map((p) => (
                   <tr
                     key={p.id}
-                    className="border-b bg-[#6D94C5] hover:bg-gray-50 mb-2 h-16 sm:h-20 cursor-pointer"
+                    className="border-b bg-[#7E4363] hover:bg-gray-50 mb-2 h-16 sm:h-20 cursor-pointer"
                     onClick={() => handleRowClick(p)}
                   >
                     <td className="px-2 py-1">{p.op}</td>
@@ -234,7 +234,7 @@ export default function Consultation() {
           ></div>
 
           {/* Modal Card */}
-          <div className="relative bg-[#6D94C5] rounded-xl shadow-lg w-full max-w-sm sm:max-w-md md:max-w-[400px] p-6 sm:p-10 flex flex-col items-center text-white">
+          <div className="relative bg-[#7E4363] rounded-xl shadow-lg w-full max-w-sm sm:max-w-md md:max-w-[400px] p-6 sm:p-10 flex flex-col items-center text-white">
             {/* Circle with image */}
             <div className="w-24 h-24 sm:w-40 sm:h-40 rounded-full bg-white flex items-center justify-center text-gray-700 text-4xl mb-4 overflow-hidden">
               <FaUser className="text-black text-4xl sm:text-5xl" />
