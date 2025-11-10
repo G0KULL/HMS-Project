@@ -59,7 +59,7 @@ export default function DoctorManagement() {
       if (!res.ok) throw new Error("Update failed");
     } catch (err) {
       console.error("Error updating status:", err);
-      alert("❌ Failed to update status");
+      alert(" Failed to update status");
       // Revert on error
       setDoctors((prev) =>
         prev.map((d) =>
@@ -86,7 +86,7 @@ export default function DoctorManagement() {
       setDoctors((prev) => prev.filter((d) => d.id !== id));
     } catch (err) {
       console.error(err);
-      alert("❌ Failed to delete doctor");
+      alert(" Failed to delete doctor");
     }
   };
 
@@ -108,7 +108,7 @@ export default function DoctorManagement() {
       {/* Table */}
       <div className="overflow-x-auto py-10">
         <table className="min-w-full border border-gray-200">
-          <thead className="bg-[#6D94C5] text-white h-20 font-poppins">
+          <thead className="bg-[#F7DACD]  h-20 font-poppins">
             <tr>
               <th className="text-left p-3 border-b">ID</th>
               <th className="text-left p-3 border-b">Name</th>
