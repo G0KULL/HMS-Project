@@ -1,12 +1,14 @@
 import React from "react";
 
-const Spectacle = ({ data = {}, onChange }) => {
+const Spectacle = ({ data = {}, onChange, viewOnly = false }) => {
   const handleChange = (e) => {
+    if (viewOnly) return; // prevent editing
     const { name, value } = e.target;
     onChange({ ...data, [name]: value });
   };
 
   const handleReset = () => {
+    if (viewOnly) return;
     onChange({
       lens_type: "",
       lens_material: "",
@@ -22,6 +24,11 @@ const Spectacle = ({ data = {}, onChange }) => {
     });
   };
 
+  const inputClass = (viewOnlyMode) =>
+    `w-full p-3 rounded-2xl ${
+      viewOnlyMode ? "bg-gray-100 text-gray-600 cursor-not-allowed" : "bg-white"
+    }`;
+
   return (
     <div className="p-6">
       {/* Heading */}
@@ -29,16 +36,18 @@ const Spectacle = ({ data = {}, onChange }) => {
         <h1 className="text-3xl font-bold inline-block bg-[#F7DACD] px-6 py-2 rounded-full">
           SPECTACLE & LENS DETAILS
         </h1>
-        <button
-          onClick={handleReset}
-          className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800"
-        >
-          Reset
-        </button>
+        {!viewOnly && (
+          <button
+            onClick={handleReset}
+            className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800"
+          >
+            Reset
+          </button>
+        )}
       </div>
 
       {/* Grid container */}
-      <div className="grid grid-cols-1 gap-6 bg-[#F7DACD] p-6 rounded-xl">
+      <div className={`grid grid-cols-1 gap-6 bg-[#F7DACD] p-6 rounded-xl`}>
         {/* Block 1 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
@@ -48,7 +57,8 @@ const Spectacle = ({ data = {}, onChange }) => {
               name="lens_type"
               value={data.lens_type || ""}
               onChange={handleChange}
-              className="w-full p-3 rounded-2xl bg-white"
+              disabled={viewOnly}
+              className={inputClass(viewOnly)}
             />
           </div>
           <div>
@@ -58,7 +68,8 @@ const Spectacle = ({ data = {}, onChange }) => {
               name="lens_material"
               value={data.lens_material || ""}
               onChange={handleChange}
-              className="w-full p-3 rounded-2xl bg-white"
+              disabled={viewOnly}
+              className={inputClass(viewOnly)}
             />
           </div>
           <div>
@@ -68,7 +79,8 @@ const Spectacle = ({ data = {}, onChange }) => {
               name="lens_coating"
               value={data.lens_coating || ""}
               onChange={handleChange}
-              className="w-full p-3 rounded-2xl bg-white"
+              disabled={viewOnly}
+              className={inputClass(viewOnly)}
             />
           </div>
         </div>
@@ -82,7 +94,8 @@ const Spectacle = ({ data = {}, onChange }) => {
               name="lens_power_re"
               value={data.lens_power_re || ""}
               onChange={handleChange}
-              className="w-full p-3 rounded-2xl bg-white"
+              disabled={viewOnly}
+              className={inputClass(viewOnly)}
             />
           </div>
           <div>
@@ -92,7 +105,8 @@ const Spectacle = ({ data = {}, onChange }) => {
               name="lens_power_le"
               value={data.lens_power_le || ""}
               onChange={handleChange}
-              className="w-full p-3 rounded-2xl bg-white"
+              disabled={viewOnly}
+              className={inputClass(viewOnly)}
             />
           </div>
           <div>
@@ -102,7 +116,8 @@ const Spectacle = ({ data = {}, onChange }) => {
               name="cylinder_re"
               value={data.cylinder_re || ""}
               onChange={handleChange}
-              className="w-full p-3 rounded-2xl bg-white"
+              disabled={viewOnly}
+              className={inputClass(viewOnly)}
             />
           </div>
         </div>
@@ -116,7 +131,8 @@ const Spectacle = ({ data = {}, onChange }) => {
               name="cylinder_le"
               value={data.cylinder_le || ""}
               onChange={handleChange}
-              className="w-full p-3 rounded-2xl bg-white"
+              disabled={viewOnly}
+              className={inputClass(viewOnly)}
             />
           </div>
           <div>
@@ -126,7 +142,8 @@ const Spectacle = ({ data = {}, onChange }) => {
               name="axis_re"
               value={data.axis_re || ""}
               onChange={handleChange}
-              className="w-full p-3 rounded-2xl bg-white"
+              disabled={viewOnly}
+              className={inputClass(viewOnly)}
             />
           </div>
           <div>
@@ -136,7 +153,8 @@ const Spectacle = ({ data = {}, onChange }) => {
               name="axis_le"
               value={data.axis_le || ""}
               onChange={handleChange}
-              className="w-full p-3 rounded-2xl bg-white"
+              disabled={viewOnly}
+              className={inputClass(viewOnly)}
             />
           </div>
         </div>
@@ -150,7 +168,8 @@ const Spectacle = ({ data = {}, onChange }) => {
               name="addition_near"
               value={data.addition_near || ""}
               onChange={handleChange}
-              className="w-full p-3 rounded-2xl bg-white"
+              disabled={viewOnly}
+              className={inputClass(viewOnly)}
             />
           </div>
           <div>
@@ -160,7 +179,8 @@ const Spectacle = ({ data = {}, onChange }) => {
               name="remarks"
               value={data.remarks || ""}
               onChange={handleChange}
-              className="w-full p-3 rounded-2xl bg-white"
+              disabled={viewOnly}
+              className={inputClass(viewOnly)}
             />
           </div>
         </div>

@@ -16,7 +16,9 @@ function PreviousVisitCard({ visit, index }) {
       >
         <div>
           <h4 className="font-semibold text-lg text-gray-800">
-            {visit.date ? new Date(visit.date).toLocaleDateString() : "Unknown Date"}
+            {visit.date
+              ? new Date(visit.date).toLocaleDateString()
+              : "Unknown Date"}
           </h4>
           <p className="text-sm text-gray-600">
             Doctor: <span className="font-medium">{visit.doctor || "N/A"}</span>
@@ -35,14 +37,18 @@ function PreviousVisitCard({ visit, index }) {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-semibold text-gray-700">Diagnosis:</label>
+              <label className="text-sm font-semibold text-gray-700">
+                Diagnosis:
+              </label>
               <p className="bg-white p-2 rounded-md border mt-1 text-gray-800">
                 {visit.diagnosis || "Not specified"}
               </p>
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-gray-700">Treatment:</label>
+              <label className="text-sm font-semibold text-gray-700">
+                Treatment:
+              </label>
               <p className="bg-white p-2 rounded-md border mt-1 text-gray-800">
                 {visit.treatment || "Not specified"}
               </p>
@@ -91,7 +97,9 @@ function PreviousVisitCard({ visit, index }) {
 export default function CaseHistory({ onClose }) {
   const navigate = useNavigate();
 
-  const [complaints, setComplaints] = useState([{ complaint: "", duration: "" }]);
+  const [complaints, setComplaints] = useState([
+    { complaint: "", duration: "" },
+  ]);
   const [caseHistory, setCaseHistory] = useState("");
   const [allergies, setAllergies] = useState("");
 
@@ -114,13 +122,12 @@ export default function CaseHistory({ onClose }) {
   ]);
 
   // --- Complaint & Document Functions ---
-  const addComplaint = () => setComplaints([...complaints, { complaint: "", duration: "" }]);
-  const removeComplaint = (index) => setComplaints(complaints.filter((_, i) => i !== index));
 
-
+  const removeComplaint = (index) =>
+    setComplaints(complaints.filter((_, i) => i !== index));
 
   const handleSave = () => {
-    const payload = { complaints, caseHistory,allergies, previousVisits };
+    const payload = { complaints, caseHistory, allergies, previousVisits };
     console.log("Case History Saved:", payload);
     if (onClose) onClose();
   };
@@ -156,45 +163,31 @@ export default function CaseHistory({ onClose }) {
 
       {/* Case History Form */}
       <div className="p-6 bg-[#F7DACD] rounded-2xl shadow-md space-y-6 mt-4">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Case History</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+          Case History
+        </h2>
 
         {/* Chief Complaints */}
         <div>
-          <h3 className="text-lg font-semibold mb-2">Chief Complaints</h3>
+          <h3 className="text-lg font-semibold mb-2"> Complaints</h3>
           {complaints.map((c, i) => (
             <div key={i} className="flex gap-3 mb-2">
-              <input
-                type="text"
-                placeholder="Complaint"
-                value={c.complaint}
-                onChange={(e) => {
-                  const updated = [...complaints];
-                  updated[i].complaint = e.target.value;
-                  setComplaints(updated);
-                }}
-                className="border rounded-lg p-2 flex-1"
-              />
-              <input
-                type="text"
-                placeholder="Duration"
-                value={c.duration}
-                onChange={(e) => {
-                  const updated = [...complaints];
-                  updated[i].duration = e.target.value;
-                  setComplaints(updated);
-                }}
-                className="border rounded-lg p-2 w-40"
+              <textarea
+                rows={6}
+                value={caseHistory}
+                onChange={(e) => setCaseHistory(e.target.value)}
+                className="w-full border rounded-lg p-3"
               />
               {i > 0 && (
-                <button onClick={() => removeComplaint(i)} className="text-red-600">
+                <button
+                  onClick={() => removeComplaint(i)}
+                  className="text-red-600"
+                >
                   <Trash2 size={20} />
                 </button>
               )}
             </div>
           ))}
-          <button onClick={addComplaint} className="flex items-center text-red-600 mt-2">
-            <Plus size={18} className="mr-1" /> Add Complaint
-          </button>
         </div>
 
         {/* Case History Textarea */}
@@ -219,10 +212,12 @@ export default function CaseHistory({ onClose }) {
           />
         </div>
 
-
         {/* Save Buttons */}
         <div className="flex justify-end gap-4 mt-4">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400"
+          >
             Cancel
           </button>
           <button
@@ -236,12 +231,13 @@ export default function CaseHistory({ onClose }) {
 
       {/* Previous Visits Section */}
       <div className="max-w-8xl mx-auto mt-10 space-y-6">
-        <h3 className="text-2xl font-semibold text-gray-800 mb-4">Previous Visits</h3>
+        <h3 className="text-2xl font-semibold text-gray-800 mb-4">
+          Previous Visits
+        </h3>
         {previousVisits.map((visit, index) => (
           <PreviousVisitCard key={index} visit={visit} index={index} />
         ))}
       </div>
-
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FiRefreshCw } from "react-icons/fi";
 
-export default function Refraction({ data = {}, onChange }) {
+export default function Refraction({ data = {}, onChange, viewOnly = false }) {
   const eyes = ["od", "os"];
   const rows = ["dist", "near"];
   const fields = ["va", "sph", "cyl", "axis"];
@@ -15,6 +15,7 @@ export default function Refraction({ data = {}, onChange }) {
       });
     });
   });
+
   // Additional fields
   initialFormData.ref_distance = "";
   initialFormData.ref_remarks = "";
@@ -23,26 +24,26 @@ export default function Refraction({ data = {}, onChange }) {
 
   // Load existing data if editing
   useEffect(() => {
-  if (data && Object.keys(data).length > 0) {
-    setFormData((prev) => {
-      // Prevent infinite loop: only update if data is different
-      const isDifferent = Object.keys(data).some(
-        (key) => data[key] !== prev[key]
-      );
-      return isDifferent ? { ...prev, ...data } : prev;
-    });
-  }
-}, [data]);
-
+    if (data && Object.keys(data).length > 0) {
+      setFormData((prev) => {
+        const isDifferent = Object.keys(data).some(
+          (key) => data[key] !== prev[key]
+        );
+        return isDifferent ? { ...prev, ...data } : prev;
+      });
+    }
+  }, [data]);
 
   const handleChange = (e) => {
+    if (viewOnly) return; // prevent edit in view mode
     const { name, value } = e.target;
     const updated = { ...formData, [name]: value };
     setFormData(updated);
-    if (onChange) onChange(updated); // send updated values to parent
+    if (onChange) onChange(updated);
   };
 
   const handleReset = () => {
+    if (viewOnly) return; // prevent reset in view mode
     setFormData(initialFormData);
     if (onChange) onChange(initialFormData);
   };
@@ -54,17 +55,24 @@ export default function Refraction({ data = {}, onChange }) {
         <h1 className="px-4 py-2 bg-[#F7DACD] text-2xl md:text-3xl rounded-full font-bold">
           SUBJECTIVE REFRACTION
         </h1>
-        <button
-          onClick={handleReset}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg shadow-md"
-        >
-          <FiRefreshCw size={20} />
-          Reset
-        </button>
+
+        {!viewOnly && (
+          <button
+            onClick={handleReset}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg shadow-md"
+          >
+            <FiRefreshCw size={20} />
+            Reset
+          </button>
+        )}
       </div>
 
       {/* OD & OS Tables */}
-      <div className="bg-[#F7DACD] p-6 md:p-8 rounded-xl space-y-6">
+      <div
+        className={`p-6 md:p-8 rounded-xl space-y-6 ${
+          viewOnly ? "bg-[#F7DACD]" : "bg-[#F7DACD]"
+        }`}
+      >
         <div className="flex flex-col md:flex-row gap-6 justify-center">
           {["OD", "OS"].map((eyeLabel, i) => {
             const eye = eyes[i];
@@ -79,7 +87,9 @@ export default function Refraction({ data = {}, onChange }) {
                       <tr className="text-base md:text-lg font-light">
                         <th className="p-2 text-left"></th>
                         {fields.map((field) => (
-                          <th key={field} className="p-2">{field.toUpperCase()}</th>
+                          <th key={field} className="p-2">
+                            {field.toUpperCase()}
+                          </th>
                         ))}
                       </tr>
                     </thead>
@@ -95,8 +105,13 @@ export default function Refraction({ data = {}, onChange }) {
                                 type="text"
                                 name={`ref_${eye}_${row}_${field}`}
                                 value={formData[`ref_${eye}_${row}_${field}`]}
+                                disabled={viewOnly}
                                 onChange={handleChange}
-                                className="w-full h-10 md:h-11 px-2 rounded bg-white border border-gray-300 text-black focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                className={`w-full h-10 md:h-11 px-2 rounded border border-gray-300 text-black ${
+                                  viewOnly
+                                    ? "bg-gray-100 text-gray-600 cursor-not-allowed"
+                                    : "bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                }`}
                               />
                             </td>
                           ))}
@@ -117,16 +132,26 @@ export default function Refraction({ data = {}, onChange }) {
             name="ref_distance"
             placeholder="Distance"
             value={formData.ref_distance}
+            disabled={viewOnly}
             onChange={handleChange}
-            className="w-full md:w-[530px] ml-24 h-20 p-3 rounded-lg border border-gray-300 bg-white shadow-sm focus:ring-2 focus:ring-[#7E4363] outline-none"
+            className={`w-full md:w-[580px] ml-24 h-20 p-3 rounded-lg border border-gray-300 shadow-sm outline-none ${
+              viewOnly
+                ? "bg-gray-100 ml-[30px] text-gray-600 cursor-not-allowed"
+                : "bg-white focus:ring-2 focus:ring-[#7E4363]"
+            }`}
           />
           <input
             type="text"
             name="ref_remarks"
             placeholder="Remarks"
             value={formData.ref_remarks}
+            disabled={viewOnly}
             onChange={handleChange}
-            className="w-full md:w-[580px] mr-7 h-20 p-3 rounded-lg border border-gray-300 bg-white shadow-sm focus:ring-2 focus:ring-[#7E4363] outline-none"
+            className={`w-full md:ml-[30px] md:w-[580px] mr-7 h-20 p-3 rounded-lg border border-gray-300 shadow-sm outline-none ${
+              viewOnly
+                ? "bg-gray-100 text-gray-600 cursor-not-allowed"
+                : "bg-white focus:ring-2 focus:ring-[#7E4363]"
+            }`}
           />
         </div>
       </div>
