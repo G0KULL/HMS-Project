@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import subimg from "../assets/subima.png";
 
-export default function Procedure({ onClose }) {
+export default function Procedure({ onClose, onDataChange }) {
   const [selected, setSelected] = useState({});
-  const [selectedList, setSelectedList] = useState([{ procedure: "", eye: "" }]);
+  const [selectedList, setSelectedList] = useState([{ procedure: "", eye: "", amount: "" }]);
   const [doctorComments, setDoctorComments] = useState({ LE: "", RE: "" });
   const [showPopup, setShowPopup] = useState(false);
 
@@ -35,7 +35,7 @@ export default function Procedure({ onClose }) {
   const ensureBlankRow = (list) => {
     const hasBlank = list.some((r) => !r.procedure?.trim());
     const filled = list.filter((r) => r.procedure?.trim());
-    return hasBlank ? [...filled, { procedure: "", eye: "" }] : [...filled, { procedure: "", eye: "" }];
+    return hasBlank ? [...filled, { procedure: "", eye: "", amount: "" }] : [...filled, { procedure: "", eye: "", amount: "" }];
   };
 
   const uniqueBottom = (list) => {
@@ -79,7 +79,7 @@ export default function Procedure({ onClose }) {
         const norm = normalize(proc);
         const filtered = prevList.filter((x) => normalize(x.procedure) !== norm);
         const eyeVal = getEye(next, index);
-        if (eyeVal) filtered.push({ procedure: proc, eye: eyeVal });
+        if (eyeVal) filtered.push({ procedure: proc, eye: eyeVal, amount: "" });
         return ensureBlankRow(uniqueBottom(filtered));
       });
 
@@ -118,14 +118,64 @@ export default function Procedure({ onClose }) {
   // --- Reset ---
   const handleReset = () => {
     setSelected({});
-    setSelectedList([{ procedure: "", eye: "" }]);
+    setSelectedList([{ procedure: "", eye: "", amount: "" }]);
     setDoctorComments({ LE: "", RE: "" });
+  };
+
+  // Helper to capitalize eye value
+  const capitalizeEye = (eye) => {
+    if (!eye) return "";
+    const lower = eye.toLowerCase();
+    if (lower === "right") return "Right";
+    if (lower === "left") return "Left";
+    if (lower === "both") return "Both";
+    return eye; // fallback
   };
 
   // --- Submit ---
   const handleSubmit = () => {
+    const valid = selectedList.filter((x) => x.procedure?.trim());
+    
+    // Pass all valid procedures as a list
+    if (onDataChange) {
+      const procedureList = valid.map((item) => ({
+        name: item.procedure || "",
+        eye: capitalizeEye(item.eye),
+        remarks: item.remarks || null,
+        amount: item.amount || null,
+      }));
+      
+      onDataChange({
+        procedureList: procedureList,
+        doctorComments: doctorComments,
+      });
+    }
+    
     setShowPopup(true);
+    setTimeout(() => {
+      if (onClose) onClose();
+    }, 2000);
   };
+  
+  // Also notify parent when data changes (optional - for real-time updates)
+  useEffect(() => {
+    if (onDataChange && selectedList.length > 0) {
+      const valid = selectedList.filter((x) => x.procedure?.trim());
+      if (valid.length > 0) {
+        const procedureList = valid.map((item) => ({
+          name: item.procedure || "",
+          eye: capitalizeEye(item.eye),
+          remarks: item.remarks || null,
+          amount: item.amount || null,
+        }));
+        
+        onDataChange({
+          procedureList: procedureList,
+          doctorComments: doctorComments,
+        });
+      }
+    }
+  }, [selectedList, doctorComments, onDataChange]);
 
   return (
     <div className="bg-white mb-28 w-full rounded-2xl shadow-lg p-4 md:p-6 overflow-y-auto max-h-[90vh] relative">
@@ -206,6 +256,16 @@ export default function Procedure({ onClose }) {
                   <option value="left">Left</option>
                   <option value="both">Both</option>
                 </select>
+              </div>
+              <div className="flex-1 w-full">
+                <h2 className="font-semibold mb-1 text-base">Amount</h2>
+                <input
+                  type="text"
+                  placeholder="Enter amount"
+                  value={item.amount}
+                  onChange={(e) => handleEdit(idx, "amount", e.target.value)}
+                  className="w-full bg-white rounded-full px-4 py-2"
+                />
               </div>
             </div>
           ))}

@@ -1,7 +1,7 @@
 // src/components/FollowUp.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-export default function FollowUp() {
+export default function FollowUp({ onChange }) {
   const [formData, setFormData] = useState({
     nextVisit: "",
     date: "",
@@ -18,16 +18,21 @@ export default function FollowUp() {
 
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+      return updated;
+    });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Submitted Data:", formData);
-  };
+  // Notify parent whenever formData changes
+  useEffect(() => {
+    if (onChange) {
+      onChange(formData);
+    }
+  }, [formData, onChange]);
 
   return (
     <div className="p-6">
@@ -36,8 +41,7 @@ export default function FollowUp() {
         FOLLOW UP
       </h1>
 
-      <form
-        onSubmit={handleSubmit}
+      <div
         className="flex justify-center items-center py-10"
       >
         <div className="w-full bg-[#F7DACD] p-6 rounded-lg shadow-md">
@@ -183,14 +187,14 @@ export default function FollowUp() {
               Save
             </button>
             <button
-              type="submit"
+              type="button"
               className="px-6 py-2 rounded-full bg-[#48D56D] text-white hover:bg-green-600 transition"
             >
               Submit
             </button>
           </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 }

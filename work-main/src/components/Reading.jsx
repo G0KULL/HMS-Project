@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // ✅ import for navigation
-// import PatientInfor from "./PatientInfor";
-import patient from "../assets/patient.jpg"
+import { useNavigate, useLocation } from "react-router-dom";
 import Subima from "../assets/subima.png";
 import ArReading from "../components/ArReading";
 import Visual from "../components/Visual";
@@ -11,7 +9,6 @@ import Retinoscopy from "../components/Retinoscopy";
 import Dialated from "../components/Dialated";
 import Keratometry from "../components/Keratometry";
 import Pachymetry from "../components/Pachymetry";
-// import Eye from "../components/Eye"; 
 import Spectacle from "../components/Spectacle";
 
 // Icons
@@ -290,24 +287,22 @@ const PatientInfo = () => {
               <p><span className="font-bold">Doctor:</span> {doctorName}</p>
             </div>
 
-            <div className="flex-shrink-0">
-              <img
-                src={patient}
-                alt="Patient"
-                className="w-[208px] h-[210px] object-cover rounded-lg shadow"
-              />
-            </div>
           </div>
         )}
 
-      {/* tab */}
+      {/* tab - FIXED: Now passes state when navigating */}
       <div className="flex justify-start space-x-4">
         {tabs.map((tab) => {
-          const isActive = location.pathname === tab.path; //  check active tab
+          const isActive = location.pathname === tab.path;
           return (
             <p
               key={tab.label}
-              onClick={() => navigate(tab.path)}
+              onClick={() => navigate(tab.path, { 
+                state: { 
+                  patient: patientData,
+                  appointment: navState.appointment || patientData?.appointment
+                } 
+              })}
               className={`border px-8 py-2 rounded-full font-bold text-2xl cursor-pointer transition
                 ${isActive ? "bg-[#F7DACD] text-white" : "hover:bg-[#F7DACD] hover:text-white"}
               `}
@@ -370,8 +365,6 @@ const PatientInfo = () => {
           />
         </>
       )}
-      {/* <FollowUp /> */}
-     
 
       {/* Action Buttons - Hidden in view-only mode */}
       {/* Buttons are disabled/hidden since this is view-only mode */}

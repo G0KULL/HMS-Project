@@ -1,7 +1,7 @@
 import React from "react";
 import { FiRefreshCw } from "react-icons/fi";
 
-const Eye = ({ data = {}, onChange }) => {
+const Eye = ({ data = {}, onChange, viewOnly = false  }) => {
   const testRows = [
     { label: "PUPIL", od: "pupil_od", os: "pupil_os" },
     { label: "CR", od: "cr_od", os: "cr_os" },
@@ -12,6 +12,7 @@ const Eye = ({ data = {}, onChange }) => {
   ];
 
   const handleChange = (e) => {
+    if (viewOnly) return;
     const { name, value } = e.target;
     onChange({ ...data, [name]: value });
   };
@@ -61,7 +62,12 @@ const Eye = ({ data = {}, onChange }) => {
                     name={row.od}
                     value={data[row.od] || ""}
                     onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
+                    disabled={viewOnly}
+                    className={`w-full h-11 p-2 rounded-md border text-center ${
+                            viewOnly
+                              ? "bg-gray-200 text-gray-700 cursor-not-allowed"
+                              : "bg-gray-50 text-black border-gray-200 focus:ring-2 focus:ring-[#7E4363] outline-none"
+                          }`}
                   />
                 </td>
                 <td className="px-3 py-2">
@@ -70,7 +76,12 @@ const Eye = ({ data = {}, onChange }) => {
                     name={row.os}
                     value={data[row.os] || ""}
                     onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
+                    disabled={viewOnly}
+                    className={`w-full h-11 p-2 rounded-md border text-center ${
+                            viewOnly
+                              ? "bg-gray-200 text-gray-700 cursor-not-allowed"
+                              : "bg-gray-50 text-black border-gray-200 focus:ring-2 focus:ring-[#7E4363] outline-none"
+                          }`}
                   />
                 </td>
               </tr>
@@ -89,7 +100,12 @@ const Eye = ({ data = {}, onChange }) => {
               name={field}
               value={data[field] || ""}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
+              disabled={viewOnly}
+              className={`w-full h-11 p-2 rounded-md border text-center ${
+                            viewOnly
+                              ? "bg-gray-200 text-gray-700 cursor-not-allowed"
+                              : "bg-gray-50 text-black border-gray-200 focus:ring-2 focus:ring-[#7E4363] outline-none"
+                          }`}
             />
           </div>
         ))}
@@ -102,7 +118,12 @@ const Eye = ({ data = {}, onChange }) => {
               name={field}
               value={data[field] || ""}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
+              disabled={viewOnly}
+              className={`w-full h-11 p-2 rounded-md border text-center ${
+                            viewOnly
+                              ? "bg-gray-200 text-gray-700 cursor-not-allowed"
+                              : "bg-gray-50 text-black border-gray-200 focus:ring-2 focus:ring-[#7E4363] outline-none"
+                          }`}
             />
           </div>
         ))}
