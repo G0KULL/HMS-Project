@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-export default function Visual({ data = {}, onChange }) {
+export default function Visual({ data = {}, onChange, viewOnly = false}) {
   const [formData, setFormData] = useState({
     va_od_distant: "",
     va_od_ph: "",
@@ -21,6 +21,7 @@ export default function Visual({ data = {}, onChange }) {
   }, []); // run only once
 
   const handleChange = (e) => {
+    if (viewOnly) return;
     const { name, value } = e.target;
     const updated = { ...formData, [name]: value };
     setFormData(updated);
@@ -68,9 +69,14 @@ export default function Visual({ data = {}, onChange }) {
                       type="text"
                       name={key}
                       value={formData[key]}
+                      disabled={viewOnly}
                       onChange={handleChange}
-                      className="w-full h-10 border border-gray-300 rounded-md text-center focus:ring-2 focus:ring-[#7E4363] outline-none"
-                    />
+                      className={`w-full h-11 p-2 rounded-md border text-center ${
+                            viewOnly
+                              ? "bg-gray-200 text-gray-700 cursor-not-allowed"
+                              : "bg-[#F7DACD] text-black border-gray-200 focus:ring-2 focus:ring-[#7E4363] outline-none"
+                          }`}
+                          />
                   </td>
                 ))}
               </tr>
@@ -99,8 +105,13 @@ export default function Visual({ data = {}, onChange }) {
                       type="text"
                       name={key}
                       value={formData[key]}
+                      disabled={viewOnly}
                       onChange={handleChange}
-                      className="w-full h-10 border border-gray-300 rounded-md text-center focus:ring-2 focus:ring-[#7E4363] outline-none"
+                      className={`w-full h-11 p-2 rounded-md border text-center ${
+                            viewOnly
+                              ? "bg-gray-200 text-gray-700 cursor-not-allowed"
+                              : "bg-gray-50 text-black border-gray-200 focus:ring-2 focus:ring-[#7E4363] outline-none"
+                          }`}
                     />
                   </td>
                 ))}

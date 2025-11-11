@@ -90,7 +90,7 @@ const Eye = ({ data = {}, onChange }) => {
               name="pmt"
               value={data.pmt || ""}
               onChange={handleChange}
-              className="w-full p-2  rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
+              className="w-full p-2 text-gray-400 rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
             />
           </div>
 
@@ -101,7 +101,7 @@ const Eye = ({ data = {}, onChange }) => {
               name="dialated"
               value={data.dialated || ""}
               onChange={handleChange}
-              className="w-full p-2  rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
+              className="w-full p-2 text-gray-400  rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
             />
           </div>
         </div>
@@ -115,7 +115,7 @@ const Eye = ({ data = {}, onChange }) => {
               name="duochrome"
               value={data.duochrome || ""}
               onChange={handleChange}
-              className="w-full p-2  rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
+              className="w-full p-2 text-gray-400  rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
             />
           </div>
 
@@ -126,7 +126,7 @@ const Eye = ({ data = {}, onChange }) => {
               name="wfdt"
               value={data.wfdt || ""}
               onChange={handleChange}
-              className="w-full p-2 rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
+              className="w-full p-2 text-gray-400 rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
             />
           </div>
         </div>

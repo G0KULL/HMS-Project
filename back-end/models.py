@@ -234,6 +234,7 @@ class Appointment(Base):
     company = relationship("Company", back_populates="appointments")
     patient = relationship("Patient", back_populates="appointments", cascade="all, delete")
     doctor = relationship("Doctor", back_populates="appointments", cascade="all, delete")
+    optometries = relationship("Optometry", back_populates="appointment")
 
 
 class Offers(Base):
@@ -303,6 +304,7 @@ class Optometry(Base):
 
     # Relationships
     company = relationship("Company", back_populates="optometrys")
+    appointment = relationship("Appointment", back_populates="optometries")
     
     tested_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -485,10 +487,10 @@ class Consultation(Base):
     __table_args__ = {"extend_existing": True}
 
     id = Column(Integer, primary_key=True, index=True)
-    doctor_id = Column(Integer, ForeignKey("doctors.id"))
-    appointment_id = Column(Integer, ForeignKey("appointments.id"))
-    company_id = Column(Integer, ForeignKey("companies.id"))
-    patient_id = Column(Integer, ForeignKey("patients.id"))
+    doctor_id = Column(Integer, ForeignKey("doctors.id"), nullable=False)
+    appointment_id = Column(Integer, ForeignKey("appointments.id"), nullable=False)
+    company_id = Column(Integer, ForeignKey("companies.id"), nullable=False)
+    patient_id = Column(Integer, ForeignKey("patients.id"), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     optometry_id = Column(Integer, ForeignKey("optometrys.id"), nullable=False)
     

@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-import schemas, crud
+import schemas, crud, models
 from database import get_db
+
 
 router = APIRouter(prefix="/consultations", tags=["Consultations"])
 
@@ -30,3 +31,13 @@ def update_consultation(consultation_id: int, consultation_update: schemas.Consu
     if not updated:
         raise HTTPException(status_code=404, detail="Consultation not found")
     return updated
+
+# Delete consultation
+@router.delete("/{consultation_id}")
+def delete_consultation(consultation_id: int, db: Session = Depends(get_db)):
+    consultation = db.query(models.Consultation).filter(models.Consultation.id == consultation_id).first()
+    if not consultation:
+        raise HTTPException(status_code=404, detail="Consultation not found")
+    db.delete(consultation)
+    db.commit()
+    return {"message": "Consultation deleted successfully"}

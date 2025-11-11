@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-export default function Diagnosis({ onClose }) {
+export default function Diagnosis({ onClose, onDataChange }) {
   const diagnoses = [
     "CATARACT - MATURE",
     "GLAUCOMA - OPEN ANGLE",
@@ -120,11 +120,54 @@ export default function Diagnosis({ onClose }) {
     setDoctorComments({ LE: "", RE: "" });
   };
 
+  // Helper to capitalize eye value
+  const capitalizeEye = (eye) => {
+    if (!eye) return "";
+    const lower = eye.toLowerCase();
+    if (lower === "right") return "Right";
+    if (lower === "left") return "Left";
+    if (lower === "both") return "Both";
+    return eye; // fallback
+  };
+
   const handleSubmit = () => {
     const valid = selectedList.filter((x) => x.diagnosis?.trim());
     console.log(valid);
+    
+    // Pass all valid diagnoses as a list
+    if (onDataChange) {
+      const diagnosisList = valid.map((item) => ({
+        condition: item.diagnosis || "",
+        eye: capitalizeEye(item.eye),
+      }));
+      
+      onDataChange({
+        diagnosisList: diagnosisList,
+        doctorComments: doctorComments,
+      });
+    }
+    
     alert("Diagnosis submitted successfully!");
+    if (onClose) onClose();
   };
+  
+  // Also notify parent when data changes (optional - for real-time updates)
+  useEffect(() => {
+    if (onDataChange && selectedList.length > 0) {
+      const valid = selectedList.filter((x) => x.diagnosis?.trim());
+      if (valid.length > 0) {
+        const diagnosisList = valid.map((item) => ({
+          condition: item.diagnosis || "",
+          eye: capitalizeEye(item.eye),
+        }));
+        
+        onDataChange({
+          diagnosisList: diagnosisList,
+          doctorComments: doctorComments,
+        });
+      }
+    }
+  }, [selectedList, doctorComments, onDataChange]);
 
   // --- UI ---
   return (

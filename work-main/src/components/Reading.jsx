@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // ✅ import for navigation
-// import PatientInfor from "./PatientInfor";
-import patient from "../assets/patient.jpg"
+import { useNavigate, useLocation } from "react-router-dom";
 import Subima from "../assets/subima.png";
 import ArReading from "../components/ArReading";
 import Visual from "../components/Visual";
@@ -11,10 +9,7 @@ import Retinoscopy from "../components/Retinoscopy";
 import Dialated from "../components/Dialated";
 import Keratometry from "../components/Keratometry";
 import Pachymetry from "../components/Pachymetry";
-// import Eye from "../components/Eye"; 
 import Spectacle from "../components/Spectacle";
-
-// Icons
 import { FiRefreshCw } from "react-icons/fi";
 import { FaCheckCircle } from "react-icons/fa";
 
@@ -32,8 +27,6 @@ const PatientInfo = () => {
   const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
   const token = localStorage.getItem("token");
 
-  // Map tabs to routes
-  // ✅ Navigation buttons
   const tabs = [
     { label: "Readings", path: "/reading" },
     { label: "Examination", path: "/examinationDoc" },
@@ -41,7 +34,6 @@ const PatientInfo = () => {
     { label: "Draw", path: "/Draw" },
   ];
 
-  // Helper function to map optometry data to component structure
   const mapOptometryData = (data) => {
     if (!data) return null;
 
@@ -147,7 +139,6 @@ const PatientInfo = () => {
     };
   };
 
-  // Fetch patient and optometry data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -160,32 +151,24 @@ const PatientInfo = () => {
       }
 
       try {
-        // Get patient/appointment data from navigation state or fetch it
         let patientInfo = navState.patient || navState.appointment;
         let appointmentInfo = navState.appointment || patientInfo?.appointment;
 
-        // If patient data is passed, use it; otherwise try to fetch from patient_id
         if (patientInfo) {
           setPatientData(patientInfo);
-          
-          // Fetch optometry data by patient_id or appointment_id
           let optometryRecord = null;
-          
-          // Try to fetch by appointment_id first
+
           if (appointmentInfo?.id) {
             try {
               const optoRes = await fetch(`${API_BASE}/optometrys/by-appointment/${appointmentInfo.id}`, {
                 headers: { Authorization: `Bearer ${token}` },
               });
-              if (optoRes.ok) {
-                optometryRecord = await optoRes.json();
-              }
-            } catch (err) {
+              if (optoRes.ok) optometryRecord = await optoRes.json();
+            } catch {
               console.log("No optometry found by appointment_id");
             }
           }
 
-          // If not found, try to fetch by patient_id
           if (!optometryRecord && (patientInfo.patient_id || patientInfo.id)) {
             const patientId = patientInfo.patient_id || patientInfo.id;
             try {
@@ -195,16 +178,14 @@ const PatientInfo = () => {
               if (optoRes.ok) {
                 const optoList = await optoRes.json();
                 if (Array.isArray(optoList) && optoList.length > 0) {
-                  // Filter by patient_id and get the most recent one
                   const patientOptometry = optoList
                     .filter((o) => o.patient_id === patientId)
                     .sort((a, b) => (b.id || 0) - (a.id || 0));
-                  if (patientOptometry.length > 0) {
+                  if (patientOptometry.length > 0)
                     optometryRecord = patientOptometry[0];
-                  }
                 }
               }
-            } catch (err) {
+            } catch {
               console.log("No optometry found by patient_id");
             }
           }
@@ -214,8 +195,10 @@ const PatientInfo = () => {
             setOptometryData(mapped);
           }
 
-          // Fetch doctor name if doctor_id exists
-          const doctorId = appointmentInfo?.doctor_id || patientInfo?.appointment?.doctor_id || optometryRecord?.doctor_id;
+          const doctorId =
+            appointmentInfo?.doctor_id ||
+            patientInfo?.appointment?.doctor_id ||
+            optometryRecord?.doctor_id;
           if (doctorId) {
             try {
               const doctorRes = await fetch(`${API_BASE}/doctors/${doctorId}`, {
@@ -243,140 +226,114 @@ const PatientInfo = () => {
     fetchData();
   }, [location.state, token, API_BASE]);
 
-  // Handle form submission (disabled in view-only mode)
   const handleSubmit = (e) => {
     e.preventDefault();
-   
     setShowPopup(true);
-  };
-
-  // Reset all inputs (disabled in view-only mode)
-  const handleReset = () => {
-    // Disabled in view-only mode
-    return;
   };
 
   return (
     <form className="max-w-8xl mx-auto p-6 space-y-6">
-    
-     {/* Heading */}
-        <h2 className="text-4xl md:text-3xl font-bold text-[#14416D]">
-          Patient Information
-        </h2>
+      <h2 className="text-4xl md:text-3xl font-bold text-[#14416D]">
+        Patient Information
+      </h2>
 
-        {/* Loading & Error */}
-        {loading && (
-          <div className="text-blue-600 font-semibold flex items-center gap-2">
-            <FiRefreshCw className="animate-spin" />
-            Loading patient data...
+      {loading && (
+        <div className="text-blue-600 font-semibold flex items-center gap-2">
+          <FiRefreshCw className="animate-spin" />
+          Loading patient data...
+        </div>
+      )}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p className="font-bold">Error</p>
+          <p>{error}</p>
+        </div>
+      )}
+
+      {patientData && (
+        <div className="bg-[#F7DACD] rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 font-medium text-2xl w-full md:w-2/3">
+            <p>
+              <span className="font-bold">Name:</span>{" "}
+              {patientData.fullName ||
+                patientData.full_name ||
+                patientData.name ||
+                "-"}
+            </p>
+            <p>
+              <span className="font-bold">Age:</span> {patientData.age || "-"}{" "}
+              YEARS
+            </p>
+            <p>
+              <span className="font-bold">Gender:</span>{" "}
+              {patientData.gender || "-"}
+            </p>
+            <p>
+              <span className="font-bold">MR Number:</span>{" "}
+              {patientData.custom_id || patientData.id || "-"}
+            </p>
+            <p>
+              <span className="font-bold">Visit Date:</span>{" "}
+              {patientData.visitDate || patientData.visit_date
+                ? new Date(
+                    patientData.visitDate || patientData.visit_date
+                  ).toLocaleDateString()
+                : "-"}
+            </p>
+            <p>
+              <span className="font-bold">Visit Type:</span>{" "}
+              {patientData.patient_type || "GENERAL CONSULTATION"}
+            </p>
+            <p>
+              <span className="font-bold">Doctor:</span> {doctorName}
+            </p>
           </div>
-        )}
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            <p className="font-bold">Error</p>
-            <p>{error}</p>
-          </div>
-        )}
+        </div>
+      )}
 
-        {/* Patient Card */}
-        {patientData && (
-          <div className="bg-[#F7DACD] rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="space-y-2 font-medium text-2xl w-full md:w-2/3">
-              <p><span className="font-bold">Name:</span> {patientData.fullName || patientData.full_name || patientData.name || "-"}</p>
-              <p><span className="font-bold">Age:</span> {patientData.age || "-"} YEARS</p>
-              <p><span className="font-bold">Gender:</span> {patientData.gender || "-"}</p>
-              <p><span className="font-bold">MR Number:</span> {patientData.custom_id || patientData.id || "-"}</p>
-              <p><span className="font-bold">Visit Date:</span> {patientData.visitDate || patientData.visit_date ? new Date(patientData.visitDate || patientData.visit_date).toLocaleDateString() : "-"}</p>
-              <p><span className="font-bold">Visit Type:</span> {patientData.patient_type || "GENERAL CONSULTATION"}</p>
-              <p><span className="font-bold">Doctor:</span> {doctorName}</p>
-            </div>
-
-            <div className="flex-shrink-0">
-              <img
-                src={patient}
-                alt="Patient"
-                className="w-[208px] h-[210px] object-cover rounded-lg shadow"
-              />
-            </div>
-          </div>
-        )}
-
-      {/* tab */}
-      <div className="flex gap-4 justify-start mt-4">
-        {tabs.map((tab, index) => (
-          <button
-            key={index}
-            onClick={() => navigate(tab.path)}
-            className={`px-6 py-2 rounded-full font-medium shadow-md ${
-              window.location.pathname === tab.path
-                ? "bg-[#F7DACD]"
-                : "border border-gray-800 hover:bg-[#f4c4b2]"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      {/* ✅ Tabs Navigation - Fixed and Clean */}
+      <div className="flex justify-start space-x-4">
+        {tabs.map((tab) => {
+          const isActive = location.pathname === tab.path;
+          return (
+            <p
+              key={tab.label}
+              onClick={() =>
+                navigate(tab.path, {
+                  state: {
+                    patient: patientData,
+                    appointment:
+                      navState.appointment || patientData?.appointment,
+                  },
+                })
+              }
+              className={`border px-8 py-2 rounded-full font-bold text-2xl cursor-pointer transition ${
+                isActive
+                  ? "bg-[#F7DACD] text-white"
+                  : "hover:bg-[#F7DACD] hover:text-white"
+              }`}
+            >
+              {tab.label}
+            </p>
+          );
+        })}
       </div>
 
-      {/* Buttons Section */}
-
-      {/* Sections - View Only Mode */}
+      {/* Optometry Sections (View-Only) */}
       {optometryData && (
         <>
-          <ArReading 
-            data={optometryData.arReading || {}} 
-            viewOnly={true} 
-            onChange={() => {}} 
-          />
-          <Visual 
-            data={optometryData.visual || {}} 
-            viewOnly={true} 
-            onChange={() => {}} 
-          />
-          <Pog 
-            data={optometryData.pog || {}} 
-            viewOnly={true} 
-            onChange={() => {}} 
-          />
-          <Refraction 
-            data={optometryData.refraction || {}} 
-            viewOnly={true} 
-            onChange={() => {}} 
-          />
-          <Retinoscopy 
-            data={optometryData.retinoscopy || {}} 
-            viewOnly={true} 
-            onChange={() => {}} 
-          />
-          <Dialated 
-            data={optometryData.dialated || {}} 
-            viewOnly={true} 
-            onChange={() => {}} 
-          />
-          <Keratometry 
-            data={optometryData.keratometry || {}} 
-            viewOnly={true} 
-            onChange={() => {}} 
-          />
-          <Pachymetry 
-            data={optometryData.pachymetry || {}} 
-            viewOnly={true} 
-            onChange={() => {}} 
-          />
-          <Spectacle 
-            data={optometryData.spectacle || {}} 
-            viewOnly={true} 
-            onChange={() => {}} 
-          />
+          <ArReading data={optometryData.arReading || {}} viewOnly />
+          <Visual data={optometryData.visual || {}} viewOnly />
+          <Pog data={optometryData.pog || {}} viewOnly />
+          <Refraction data={optometryData.refraction || {}} viewOnly />
+          <Retinoscopy data={optometryData.retinoscopy || {}} viewOnly />
+          <Dialated data={optometryData.dialated || {}} viewOnly />
+          <Keratometry data={optometryData.keratometry || {}} viewOnly />
+          <Pachymetry data={optometryData.pachymetry || {}} viewOnly />
+          <Spectacle data={optometryData.spectacle || {}} viewOnly />
         </>
       )}
-      {/* <FollowUp /> */}
-     
 
-      {/* Action Buttons - Hidden in view-only mode */}
-      {/* Buttons are disabled/hidden since this is view-only mode */}
-
-      {/* Popup Modal */}
       {showPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg text-center w-full max-w-[900px] relative">

@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Check, RefreshCcw } from "lucide-react";
 import subima from "../assets/subima.png";
 
-export default function OTCounselling({ onClose }) {
+export default function OTCounselling({ onClose, onDataChange }) {
   const [selected, setSelected] = useState({});
   const [adviceData, setAdviceData] = useState([{ advice: "", eye: "" }]);
   const [showPopup, setShowPopup] = useState(false);
@@ -48,14 +48,109 @@ export default function OTCounselling({ onClose }) {
     setAdviceData([...adviceData, { advice: "", eye: "" }]);
   };
 
+  // Helper to capitalize eye value
+  const capitalizeEye = (eye) => {
+    if (!eye) return "";
+    const lower = eye.toLowerCase();
+    if (lower === "right" || lower === "re") return "Right";
+    if (lower === "left" || lower === "le") return "Left";
+    if (lower === "both") return "Both";
+    return eye; // fallback
+  };
+
   // Submit → show popup
-  const handleSubmit = () => setShowPopup(true);
+  const handleSubmit = () => {
+    // Build OT counselling list from selected procedures and advice
+    const otCounsellingList = [];
+    
+    // Add selected procedures
+    procedures.forEach((proc, i) => {
+      if (selected[`${i}-right`] || selected[`${i}-left`]) {
+        let eye = "Both";
+        if (selected[`${i}-right`] && !selected[`${i}-left`]) eye = "Right";
+        if (!selected[`${i}-right`] && selected[`${i}-left`]) eye = "Left";
+        
+        otCounsellingList.push({
+          procedure_name: proc,
+          eye: eye,
+          remarks: null,
+          consent: null,
+        });
+      }
+    });
+    
+    // Add advice items
+    adviceData.forEach((item) => {
+      if (item.advice?.trim()) {
+        otCounsellingList.push({
+          procedure_name: item.advice,
+          eye: capitalizeEye(item.eye),
+          remarks: null,
+          consent: null,
+        });
+      }
+    });
+    
+    // Notify parent
+    if (onDataChange) {
+      onDataChange({
+        otCounsellingList: otCounsellingList,
+      });
+    }
+    
+    setShowPopup(true);
+    setTimeout(() => {
+      if (onClose) onClose();
+    }, 2000);
+  };
 
   // Reset → clear selections and history
   const handleReset = () => {
     setSelected({});
     setAdviceData([{ advice: "", eye: "" }]);
   };
+  
+  // Also notify parent when data changes (optional - for real-time updates)
+  useEffect(() => {
+    if (onDataChange) {
+      const otCounsellingList = [];
+      
+      // Add selected procedures
+      procedures.forEach((proc, i) => {
+        if (selected[`${i}-right`] || selected[`${i}-left`]) {
+          let eye = "Both";
+          if (selected[`${i}-right`] && !selected[`${i}-left`]) eye = "Right";
+          if (!selected[`${i}-right`] && selected[`${i}-left`]) eye = "Left";
+          
+          otCounsellingList.push({
+            procedure_name: proc,
+            eye: eye,
+            remarks: null,
+            consent: null,
+          });
+        }
+      });
+      
+      // Add advice items
+      adviceData.forEach((item) => {
+        if (item.advice?.trim()) {
+          otCounsellingList.push({
+            procedure_name: item.advice,
+            eye: capitalizeEye(item.eye),
+            remarks: null,
+            consent: null,
+          });
+        }
+      });
+      
+      if (otCounsellingList.length > 0) {
+        onDataChange({
+          otCounsellingList: otCounsellingList,
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected, adviceData, onDataChange]);
 
   return (
     <div className="bg-white w-full rounded-2xl shadow-lg p-4 sm:p-6 overflow-y-auto max-h-[85vh] pb-20 relative">
