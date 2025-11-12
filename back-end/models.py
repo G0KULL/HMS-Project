@@ -496,7 +496,7 @@ class Consultation(Base):
     
     #---follow up ---
     nextVisit = Column(String,nullable=True)
-    followup_date= Column(Date, nullable=False)
+    followup_date= Column(Date, nullable=True)
     usagePerDay = Column(String,nullable=True)
     transferOutside= Column(Boolean,nullable=True)
     outsideDetails= Column(String,nullable=True)

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr,field_serializer
+from pydantic import BaseModel, EmailStr,field_serializer,field_validator
 from datetime import date, datetime
 from typing import List, Optional,Literal
 from enum import Enum
@@ -439,6 +439,7 @@ class OptometryBase(BaseModel):
     appointment_id: Optional[int]
     user_id: Optional[int] = None  # patient or linked user
     patient_id :Optional[int]
+    doctor_id : Optional[int] = None
     
     presenting_complaints: Optional[str] = None
     case_history: Optional[str] = None
@@ -637,11 +638,11 @@ class OtCounsellingItem(BaseModel):
 # -----------------------------
 class ConsultationBase(BaseModel):
     doctor_id: Optional[int] = None
-    appointment_id: Optional[int] = None
-    company_id: Optional[int] = None
-    patient_id: Optional[int] = None
-    user_id: Optional[int] = None
-    optometry_id: Optional[int] = None
+    appointment_id:int
+    company_id:Optional[int] = None
+    patient_id: int
+    user_id: int
+    optometry_id:int
 
     nextVisit: Optional[str] = None
     followup_date: Optional[date] = None
@@ -678,6 +679,10 @@ class ConsultationBase(BaseModel):
     quantity: Optional[str] = None
     start_date: Optional[date] = None
     end_date: Optional[date] = None
+    
+    @field_validator('start_date', 'end_date', mode='before')
+    def empty_str_to_none(cls, v):
+        return None if v == "" else v
 
     # Kit & Instruction
     kit: Optional[str] = None
@@ -688,13 +693,13 @@ class ConsultationBase(BaseModel):
 # Create & Update Schemas
 # -----------------------------
 class ConsultationCreate(ConsultationBase):
-    doctor_id: int
+    doctor_id: Optional[int] = None
     appointment_id: int
-    company_id: int
+    company_id: Optional[int] = None
     patient_id: int
     user_id: int
     optometry_id: int
-    followup_date: date
+    followup_date: Optional[date] = None
 
 
 class ConsultationUpdate(ConsultationBase):

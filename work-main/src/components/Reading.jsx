@@ -282,7 +282,6 @@ const PatientInfo = () => {
               <p><span className="font-bold">Age:</span> {patientData.age || "-"} YEARS</p>
               <p><span className="font-bold">Gender:</span> {patientData.gender || "-"}</p>
               <p><span className="font-bold">MR Number:</span> {patientData.custom_id || patientData.id || "-"}</p>
-              <p><span className="font-bold">Visit Date:</span> {patientData.visitDate || patientData.visit_date ? new Date(patientData.visitDate || patientData.visit_date).toLocaleDateString() : "-"}</p>
               <p><span className="font-bold">Visit Type:</span> {patientData.patient_type || "GENERAL CONSULTATION"}</p>
               <p><span className="font-bold">Doctor:</span> {doctorName}</p>
             </div>

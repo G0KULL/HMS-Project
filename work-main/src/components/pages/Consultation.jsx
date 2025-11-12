@@ -20,22 +20,52 @@ export default function Consultation() {
   const [cardCounts, setCardCounts] = useState({
     "READY TO SEE": 0,
     "AT AR ROOM": 0,
-    "DILATATION": 0,
+    DILATATION: 0,
     "RE REFRACTION": 0,
-    "COUNSELLING": 0,
-    "CONSULTED": 0,
+    COUNSELLING: 0,
+    CONSULTED: 0,
   });
 
   const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
   const token = localStorage.getItem("token");
 
   const cardsData = [
-    { id: 1, title: "READY TO SEE", count: cardCounts["READY TO SEE"], color: "bg-[#D8434F9E]" },
-    { id: 2, title: "AT AR ROOM", count: cardCounts["AT AR ROOM"], color: "bg-[#0A62B96B]" },
-    { id: 3, title: "DILATATION", count: cardCounts["DILATATION"], color: "bg-[#EFB2319E]" },
-    { id: 4, title: "RE REFRACTION", count: cardCounts["RE REFRACTION"], color: "bg-[#15868A9E]" },
-    { id: 5, title: "COUNSELLING", count: cardCounts["COUNSELLING"], color: "bg-[#642D489E]" },
-    { id: 6, title: "CONSULTED", count: cardCounts["CONSULTED"], color: "bg-[#DD135D9E]" },
+    {
+      id: 1,
+      title: "READY TO SEE",
+      count: cardCounts["READY TO SEE"],
+      color: "bg-[#D8434F9E]",
+    },
+    {
+      id: 2,
+      title: "AT AR ROOM",
+      count: cardCounts["AT AR ROOM"],
+      color: "bg-[#0A62B96B]",
+    },
+    {
+      id: 3,
+      title: "DILATATION",
+      count: cardCounts["DILATATION"],
+      color: "bg-[#EFB2319E]",
+    },
+    {
+      id: 4,
+      title: "RE REFRACTION",
+      count: cardCounts["RE REFRACTION"],
+      color: "bg-[#15868A9E]",
+    },
+    {
+      id: 5,
+      title: "COUNSELLING",
+      count: cardCounts["COUNSELLING"],
+      color: "bg-[#642D489E]",
+    },
+    {
+      id: 6,
+      title: "CONSULTED",
+      count: cardCounts["CONSULTED"],
+      color: "bg-[#DD135D9E]",
+    },
   ];
 
   const handleCardClick = (card) => {
@@ -78,7 +108,13 @@ export default function Consultation() {
         const optoList = Array.isArray(optoData) ? optoData : [];
 
         // Update card counts - READY TO SEE = number of patients who have done optometry
-        const uniquePatientIds = [...new Set(optoList.map((o) => o.patient_id).filter((id) => id !== null && id !== undefined))];
+        const uniquePatientIds = [
+          ...new Set(
+            optoList
+              .map((o) => o.patient_id)
+              .filter((id) => id !== null && id !== undefined)
+          ),
+        ];
         const readyToSeeCount = uniquePatientIds.length;
 
         setCardCounts((prev) => ({
@@ -91,14 +127,24 @@ export default function Consultation() {
 
         // 3️⃣ Fetch each patient's data
         const patientPromises = patientIds.map(async (id) => {
-          const res = await fetch(`${API_BASE}/patients/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (!res.ok) throw new Error(`Failed to fetch patient ${id}`);
-          return res.json();
+          try {
+            const res = await fetch(`${API_BASE}/patients/${id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!res.ok) {
+              console.warn(`Skipping missing patient ${id}`);
+              return null; // skip missing ones instead of throwing
+            }
+            return await res.json();
+          } catch (err) {
+            console.error(`Error fetching patient ${id}:`, err);
+            return null;
+          }
         });
 
-        const patientData = await Promise.all(patientPromises);
+        const patientData = (await Promise.all(patientPromises)).filter(
+          Boolean
+        ); // remove nulls
 
         // 4️⃣ Merge with appointment/intime info if needed
         const combined = patientData.map((p) => {
@@ -122,7 +168,12 @@ export default function Consultation() {
             remark: optometryRecord?.remarks || "-",
             custom_id: p.custom_id || p.id, // Add custom_id for Reading.jsx
             patient_type: "GENERAL CONSULTATION", // Add patient_type for Reading.jsx
-            appointment: optometryRecord ? { id: optometryRecord.appointment_id, doctor_id: optometryRecord.doctor_id } : null, // Add appointment info if available
+            appointment: optometryRecord
+              ? {
+                  id: optometryRecord.appointment_id,
+                  doctor_id: optometryRecord.doctor_id,
+                }
+              : null, // Add appointment info if available
           };
         });
 
@@ -192,13 +243,16 @@ export default function Consultation() {
               </tr>
             </thead>
             <tbody>
-              {loading && <p className="mt-6 text-gray-500">Loading patients...</p>}
-{error && <p className="mt-6 text-red-500">Error: {error}</p>}
+              {loading && (
+                <p className="mt-6 text-gray-500">Loading patients...</p>
+              )}
+              {error && <p className="mt-6 text-red-500">Error: {error}</p>}
 
               {patients
                 .filter(
                   (p) =>
-                    p.intime === cardsData.find((c) => c.id === activeCard)?.title
+                    p.intime ===
+                    cardsData.find((c) => c.id === activeCard)?.title
                 )
                 .map((p) => (
                   <tr

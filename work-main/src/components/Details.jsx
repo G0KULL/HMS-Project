@@ -1,60 +1,60 @@
-import React, { useState, useEffect } from "react";
-import Diagnosis from "./Diagnosis"; // Ensure correct path
-import Procedure from "./Procedure"; // Ensure correct path
-import OTCounselling from "./OtCounselling"; // Ensure correct path
-// import Treatment from "./Treatment"; 
+import React, { useState, useEffect, useCallback } from "react";
+import Diagnosis from "./Diagnosis";
+import Procedure from "./Procedure";
+import OTCounselling from "./OtCounselling";
 import PrescribeMedi from "../components/PrescribeMedi";
 
 const Details = ({ onChange }) => {
   const [openModal, setOpenModal] = useState(null);
   const [medicineData, setMedicineData] = useState({
-  category: "",
-  itemName: "",
-  dosage: "",
-  frequency: "",
-  duration: "",
-  route: "",
-  quantity: "",
-  start_date: "",
-  end_date: "",
-  kit: "",
-  instruction: "",
-});
+    category: "",
+    itemName: "",
+    dosage: "",
+    frequency: "",
+    duration: "",
+    route: "",
+    quantity: "",
+    start_date: "",
+    end_date: "",
+    kit: "",
+    instruction: "",
+  });
 
-  
-  // Store data from child components
   const [diagnosisData, setDiagnosisData] = useState({
-    diagnosisList: [], // List of {condition, eye}
+    diagnosisList: [],
     doctorComments: { LE: "", RE: "" },
   });
   
   const [procedureData, setProcedureData] = useState({
-    procedureList: [], // List of {name, eye, remarks?, amount?}
+    procedureList: [],
     doctorComments: { LE: "", RE: "" },
   });
   
   const [otCounsellingData, setOtCounsellingData] = useState({
-    otCounsellingList: [], // List of {procedure_name, eye, remarks?, consent?}
+    otCounsellingList: [],
   });
 
-  // Combine all data and notify parent
+  // 🔥 FIX: Memoize the combined data to prevent infinite loops
+  const combinedData = useCallback(() => ({
+    diagnosisList: diagnosisData.diagnosisList || [],
+    diagnosisComments: diagnosisData.doctorComments || { LE: "", RE: "" },
+    procedureList: procedureData.procedureList || [],
+    procedureComments: procedureData.doctorComments || { LE: "", RE: "" },
+    otCounsellingList: otCounsellingData.otCounsellingList || [],
+    medicineData: medicineData,
+  }), [diagnosisData, procedureData, otCounsellingData, medicineData]);
+
+  // 🔥 FIX: Only call onChange when data actually changes
   useEffect(() => {
     if (onChange) {
-      const combinedData = {
-        diagnosisList: diagnosisData.diagnosisList || [],
-        diagnosisComments: diagnosisData.doctorComments || { LE: "", RE: "" },
-        procedureList: procedureData.procedureList || [],
-        procedureComments: procedureData.doctorComments || { LE: "", RE: "" },
-        otCounsellingList: otCounsellingData.otCounsellingList || [],
-        medicineData: medicineData,
-      };
-      onChange(combinedData);
+      onChange(combinedData());
     }
-  }, [diagnosisData, procedureData, otCounsellingData,medicineData, onChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [diagnosisData, procedureData, otCounsellingData, medicineData]);
 
   return (
     <div className="p-6 space-y-12">
-      {/* ================= DIAGNOSIS ================= */}
+      {/* DIAGNOSIS */}
       <div>
         <h1 className="text-3xl font-bold mb-3">DIAGNOSIS</h1>
         <div
@@ -84,7 +84,7 @@ const Details = ({ onChange }) => {
         </div>
       </div>
 
-      {/* ================= PROCEDURE ================= */}
+      {/* PROCEDURE */}
       <div>
         <h1 className="text-3xl font-bold mb-3">PROCEDURE</h1>
         <div
@@ -123,14 +123,14 @@ const Details = ({ onChange }) => {
         </div>
       </div>
 
-      {/* ================= OT COUNSELLING ================= */}
+      {/* OT COUNSELLING */}
       <div>
         <h1 className="text-3xl font-bold mb-3">OT COUNSELLING</h1>
         <div
           className="bg-[#F7DACD] rounded-lg shadow p-6 cursor-pointer"
           onClick={() => setOpenModal("ot")}
         >
-          <div className="grid grid-cols-1 md:h-[200px]  md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:h-[200px] md:grid-cols-2 gap-6">
             <div>
               <h2 className="text-[32px]">Surgery Name</h2>
               <input 
@@ -153,7 +153,7 @@ const Details = ({ onChange }) => {
         </div>
       </div>
 
-      {/* ================= TREATMENT ================= */}
+      {/* TREATMENT */}
       <div>
         <h1 className="text-3xl font-bold mb-3">TREATMENT</h1>
         <div
@@ -163,25 +163,45 @@ const Details = ({ onChange }) => {
           <div className="grid grid-cols-1 md:grid-cols-4 md:h-[200px] gap-6">
             <div>
               <h2 className="text-[32px]">Medicine</h2>
-              <input type="text" className="w-full bg-white rounded-full px-3 py-6 mt-1" />
+              <input 
+                type="text" 
+                value={medicineData.itemName || ""}
+                readOnly
+                className="w-full bg-white rounded-full px-3 py-6 mt-1" 
+              />
             </div>
             <div>
               <h2 className="text-[32px]">Dosage</h2>
-              <input type="text" className="w-full bg-white rounded-full px-3 py-6 mt-1" />
+              <input 
+                type="text" 
+                value={medicineData.dosage || ""}
+                readOnly
+                className="w-full bg-white rounded-full px-3 py-6 mt-1" 
+              />
             </div>
             <div>
               <h2 className="text-[32px]">Duration</h2>
-              <input type="text" className="w-full bg-white rounded-full px-3 py-6 mt-1" />
+              <input 
+                type="text" 
+                value={medicineData.duration || ""}
+                readOnly
+                className="w-full bg-white rounded-full px-3 py-6 mt-1" 
+              />
             </div>
             <div>
               <h2 className="text-[32px]">Route</h2>
-              <input type="text" className="w-full bg-white rounded-full px-3 py-6 mt-1" />
+              <input 
+                type="text" 
+                value={medicineData.route || ""}
+                readOnly
+                className="w-full bg-white rounded-full px-3 py-6 mt-1" 
+              />
             </div>
           </div>
         </div>
       </div>
 
-      {/* ================= POPUPS ================= */}
+      {/* POPUPS */}
       {openModal === "diagnosis" && (
         <div className="fixed inset-0 z-50 flex justify-center items-start pt-20">
           <div className="absolute inset-0 backdrop-blur-sm bg-gray-200/30" onClick={() => setOpenModal(null)} />
@@ -223,8 +243,8 @@ const Details = ({ onChange }) => {
           <div className="absolute inset-0 backdrop-blur-sm bg-gray-200/30" onClick={() => setOpenModal(null)} />
           <div className="relative z-10 w-11/12 max-w-7xl">
             <PrescribeMedi 
-            onClose={() => setOpenModal(null)}
-            onDataChange={(data) => setMedicineData(data)} 
+              onClose={() => setOpenModal(null)}
+              onDataChange={(data) => setMedicineData(data)} 
             />
           </div>
         </div>

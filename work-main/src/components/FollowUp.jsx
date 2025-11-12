@@ -1,5 +1,5 @@
 // src/components/FollowUp.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 export default function FollowUp({ onChange }) {
   const [formData, setFormData] = useState({
@@ -18,32 +18,33 @@ export default function FollowUp({ onChange }) {
 
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target;
-    setFormData((prev) => {
-      const updated = {
-        ...prev,
-        [name]: type === "checkbox" ? checked : value,
-      };
-      return updated;
-    });
+    const updated = {
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    };
+    setFormData(updated);
+    
+    // 🔥 FIX: Call onChange immediately when data changes
+    if (onChange) {
+      onChange(updated);
+    }
   };
 
-  // Notify parent whenever formData changes
-  useEffect(() => {
+  const handleSave = () => {
     if (onChange) {
       onChange(formData);
     }
-  }, [formData, onChange]);
+    console.log("Follow-up data saved:", formData);
+    alert("Follow-up data saved!");
+  };
 
   return (
     <div className="p-6">
-      {/* Heading */}
       <h1 className="text-2xl font-bold text-start inline-block bg-[#F7DACD] px-4 py-2 rounded-full mb-6">
         FOLLOW UP
       </h1>
 
-      <div
-        className="flex justify-center items-center py-10"
-      >
+      <div className="flex justify-center items-center py-10">
         <div className="w-full bg-[#F7DACD] p-6 rounded-lg shadow-md">
           {/* Next Visit Info */}
           <div className="grid grid-cols-4 gap-4 text-xl text-start mb-6">
@@ -81,7 +82,6 @@ export default function FollowUp({ onChange }) {
             <div className="flex flex-wrap text-xl gap-4">
               <p className="font-medium mt-1">Transfer To:</p>
 
-              {/* Outside checkbox + input */}
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -101,7 +101,6 @@ export default function FollowUp({ onChange }) {
                 />
               </div>
 
-              {/* Options */}
               <label className="flex items-center gap-2 px-3 py-1 text-sm rounded-full bg-[#48D56D] text-white font-medium shadow cursor-pointer hover:bg-green-600 transition">
                 <input
                   type="checkbox"
@@ -182,15 +181,9 @@ export default function FollowUp({ onChange }) {
             <button
               type="button"
               className="px-6 py-2 rounded-full bg-[#48D56D] text-white hover:bg-green-600 transition"
-              onClick={() => console.log("Save clicked", formData)}
+              onClick={handleSave}
             >
               Save
-            </button>
-            <button
-              type="button"
-              className="px-6 py-2 rounded-full bg-[#48D56D] text-white hover:bg-green-600 transition"
-            >
-              Submit
             </button>
           </div>
         </div>

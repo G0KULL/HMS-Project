@@ -941,43 +941,45 @@ def delete_offer(db: Session, db_offer: models.Offers):
 
 
 
-
-
-# Add these functions to your crud.py file (replace existing optometry functions)
-
 def create_optometry(db: Session, data: schemas.OptometryCreate, current_user):
-    """Create a new optometry record"""
+    """Create a new optometry record with doctor_id from appointment"""
     try:
         # Use dict() for Pydantic v1 or model_dump() for v2
         try:
             optometry_data = data.model_dump(exclude_unset=True, exclude={"tested_by"})
         except AttributeError:
-            # Fallback for Pydantic v1
             optometry_data = data.dict(exclude_unset=True, exclude={"tested_by"})
-        
+
         # Add metadata
         optometry_data['tested_by'] = current_user.id
         optometry_data['user_id'] = current_user.id
         optometry_data['company_id'] = current_user.company_id
         optometry_data['tested_at'] = datetime.utcnow()
-        
-        # Create the optometry record
-        new_opt = models.Optometry(**optometry_data)
-        db.add(new_opt)
-        db.commit()
-        db.refresh(new_opt)
-        
-        # Update the appointment with optometry_id
+
+        # If appointment_id is provided, fetch the appointment to get doctor_id
+        doctor_id = None
         if data.appointment_id:
             appointment = db.query(models.Appointment).filter(
                 models.Appointment.id == data.appointment_id
             ).first()
             if appointment:
-                appointment.optometryId = new_opt.id
-                db.commit()
-        
+                optometry_data['doctor_id'] = appointment.doctor_id  # store doctor_id
+            else:
+                optometry_data['doctor_id'] = None  # or raise an error if needed
+
+        # Create the optometry record
+        new_opt = models.Optometry(**optometry_data)
+        db.add(new_opt)
+        db.commit()
+        db.refresh(new_opt)
+
+        # Update the appointment with optometry_id
+        if data.appointment_id and appointment:
+            appointment.optometryId = new_opt.id
+            db.commit()
+
         return new_opt
-    
+
     except Exception as e:
         db.rollback()
         print(f"Error creating optometry: {str(e)}")
@@ -985,6 +987,7 @@ def create_optometry(db: Session, data: schemas.OptometryCreate, current_user):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to create optometry: {str(e)}"
         )
+
 
 
 def get_all_optometry(db: Session):
@@ -1084,48 +1087,74 @@ def delete_optometry(db: Session, optometry_id: int):
         
 
 # Create consultation
-def create_consultation(db: Session, consultation: schemas.ConsultationCreate):
-    db_consult = models.Consultation(
-        doctor_id=consultation.doctor_id,
-        appointment_id=consultation.appointment_id,
-        company_id=consultation.company_id,
-        patient_id=consultation.patient_id,
-        user_id=consultation.user_id,
-        optometry_id=consultation.optometry_id,
-        followup_date=consultation.followup_date,
-        nextVisit=consultation.nextVisit,
-        usagePerDay=consultation.usagePerDay,
-        transferOutside=consultation.transferOutside,
-        outsideDetails=consultation.outsideDetails,
-        dilatation=consultation.dilatation,
-        rerefraction=consultation.rerefraction,
-        highRiskPatient=consultation.highRiskPatient,
-        fileClose=consultation.fileClose,
-        additionalRemarks=consultation.additionalRemarks,
-        highRiskRemarks=consultation.highRiskRemarks,
-        diagnosis=[d.dict() for d in consultation.diagnosis] if consultation.diagnosis else None,
-        dia_comments_le=consultation.dia_comments_le,
-        dia_comments_re=consultation.dia_comments_re,
-        procedure=[p.dict() for p in consultation.procedure] if consultation.procedure else None,
-        pro_comments_le=consultation.pro_comments_le,
-        pro_comments_re=consultation.pro_comments_re,
-        ot_counsil=[o.dict() for o in consultation.ot_counsil] if consultation.ot_counsil else None,
-        category=consultation.category,
-        itemName=consultation.itemName,
-        dosage=consultation.dosage,
-        frequency=consultation.frequency,
-        duration=consultation.duration,
-        route=consultation.route,
-        quantity=consultation.quantity,
-        start_date=consultation.start_date,
-        end_date=consultation.end_date,
-        kit=consultation.kit,
-        instruction=consultation.instruction,
-    )
-    db.add(db_consult)
-    db.commit()
-    db.refresh(db_consult)
-    return db_consult
+def create_consultation(db: Session, data: schemas.ConsultationCreate, current_user):
+    """Create a new consultation record with doctor_id and company_id auto-assigned."""
+    try:
+        # Handle both Pydantic v1 & v2
+        try:
+            consult_data = data.model_dump(exclude_unset=True)
+        except AttributeError:
+            consult_data = data.dict(exclude_unset=True)
+
+        # Set default metadata
+        consult_data["user_id"] = current_user.id
+        consult_data["company_id"] = current_user.company_id or None
+
+        # --- Fetch doctor/company info from appointment or optometry ---
+        doctor_id = None
+        company_id = current_user.company_id
+
+        # Try appointment first
+        if consult_data.get("appointment_id"):
+            appointment = db.query(models.Appointment).filter(
+                models.Appointment.id == consult_data["appointment_id"]
+            ).first()
+            if appointment:
+                doctor_id = appointment.doctor_id or doctor_id
+                company_id = appointment.company_id or company_id
+
+        # If not found, fallback to optometry
+        if not doctor_id and consult_data.get("optometry_id"):
+            optometry = db.query(models.Optometry).filter(
+                models.Optometry.id == consult_data["optometry_id"]
+            ).first()
+            if optometry:
+                doctor_id = optometry.doctor_id or doctor_id
+                company_id = optometry.company_id or company_id
+
+        # Fallback to user if all else fails
+        consult_data["doctor_id"] = doctor_id or current_user.id
+        consult_data["company_id"] = company_id or current_user.company_id
+
+        # --- Normalize nested data ---
+        for field in ["diagnosis", "procedure", "ot_counsil"]:
+            if field in consult_data and consult_data[field] is not None:
+                consult_data[field] = [
+                    d.dict() if hasattr(d, "dict") else d for d in consult_data[field]
+                ]
+
+        # --- Ensure valid date fields ---
+        from datetime import date
+        today = date.today()
+        if not consult_data.get("start_date"):
+            consult_data["start_date"] = today
+        if not consult_data.get("end_date"):
+            consult_data["end_date"] = today
+
+        # --- Create record ---
+        new_consult = models.Consultation(**consult_data)
+        db.add(new_consult)
+        db.commit()
+        db.refresh(new_consult)
+        return new_consult
+
+    except Exception as e:
+        db.rollback()
+        print(f"Error creating consultation: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create consultation: {str(e)}"
+        )
 
 
 # Get all consultations
@@ -1143,12 +1172,15 @@ def update_consultation(db: Session, consultation_id: int, consultation_update: 
     db_consult = db.query(models.Consultation).filter(models.Consultation.id == consultation_id).first()
     if not db_consult:
         return None
+
     for key, value in consultation_update.dict(exclude_unset=True).items():
         if key in ["diagnosis", "procedure", "ot_counsil"] and value is not None:
-            setattr(db_consult, key, [v.dict() for v in value])
+            setattr(db_consult, key, [v.dict() if hasattr(v, "dict") else v for v in value])
         else:
             setattr(db_consult, key, value)
+
     db.commit()
     db.refresh(db_consult)
     return db_consult
+
 

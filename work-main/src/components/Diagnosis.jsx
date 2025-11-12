@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 export default function Diagnosis({ onClose, onDataChange }) {
   const diagnoses = [
@@ -14,7 +14,6 @@ export default function Diagnosis({ onClose, onDataChange }) {
     "STRABISMUS – ICS",
   ];
 
-  // Normalize function (case-insensitive, dash & space insensitive)
   const normalize = (s = "") =>
     s
       .toString()
@@ -29,7 +28,6 @@ export default function Diagnosis({ onClose, onDataChange }) {
   const [selectedList, setSelectedList] = useState([{ diagnosis: "", eye: "" }]);
   const [doctorComments, setDoctorComments] = useState({ LE: "", RE: "" });
 
-  // --- Utility functions ---
   const ensureBlankRow = (list) => {
     const hasBlank = list.some((r) => !r.diagnosis?.trim());
     const filled = list.filter((r) => r.diagnosis?.trim());
@@ -55,7 +53,6 @@ export default function Diagnosis({ onClose, onDataChange }) {
     return "";
   };
 
-  // --- Handlers ---
   const toggleCheck = (eye, index) => {
     const keyR = `${index}-right`, keyL = `${index}-left`, keyB = `${index}-both`;
     const diag = diagnoses[index];
@@ -69,7 +66,6 @@ export default function Diagnosis({ onClose, onDataChange }) {
         next[keyB] = next[keyR] && next[keyL];
       }
 
-      // Sync to bottom section
       setSelectedList((prevList) => {
         const norm = normalize(diag);
         const filtered = prevList.filter((x) => normalize(x.diagnosis) !== norm);
@@ -101,7 +97,6 @@ export default function Diagnosis({ onClose, onDataChange }) {
           return next;
         });
 
-        // Remove duplicate diagnosis
         const cleaned = list.filter((x, idx) => idx === i || normalize(x.diagnosis) !== norm);
         return ensureBlankRow(uniqueBottom(cleaned));
       }
@@ -120,21 +115,18 @@ export default function Diagnosis({ onClose, onDataChange }) {
     setDoctorComments({ LE: "", RE: "" });
   };
 
-  // Helper to capitalize eye value
   const capitalizeEye = (eye) => {
     if (!eye) return "";
     const lower = eye.toLowerCase();
     if (lower === "right") return "Right";
     if (lower === "left") return "Left";
     if (lower === "both") return "Both";
-    return eye; // fallback
+    return eye;
   };
 
   const handleSubmit = () => {
     const valid = selectedList.filter((x) => x.diagnosis?.trim());
-    console.log(valid);
     
-    // Pass all valid diagnoses as a list
     if (onDataChange) {
       const diagnosisList = valid.map((item) => ({
         condition: item.diagnosis || "",
@@ -151,28 +143,12 @@ export default function Diagnosis({ onClose, onDataChange }) {
     if (onClose) onClose();
   };
   
-  // Also notify parent when data changes (optional - for real-time updates)
-  useEffect(() => {
-    if (onDataChange && selectedList.length > 0) {
-      const valid = selectedList.filter((x) => x.diagnosis?.trim());
-      if (valid.length > 0) {
-        const diagnosisList = valid.map((item) => ({
-          condition: item.diagnosis || "",
-          eye: capitalizeEye(item.eye),
-        }));
-        
-        onDataChange({
-          diagnosisList: diagnosisList,
-          doctorComments: doctorComments,
-        });
-      }
-    }
-  }, [selectedList, doctorComments, onDataChange]);
+  // 🔥 FIX: Remove the infinite loop useEffect
+  // Only notify parent on explicit user actions (Submit button)
+  // OR use a debounced/memoized callback
 
-  // --- UI ---
   return (
     <div className="bg-white mb-20 w-full rounded-2xl shadow-lg p-6 overflow-y-auto max-h-[90vh] relative">
-      {/* Close */}
       <button
         onClick={onClose}
         className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
@@ -185,7 +161,6 @@ export default function Diagnosis({ onClose, onDataChange }) {
           Diagnosis (Selection Table)
         </h2>
 
-        {/* Diagnosis table */}
         <div className="overflow-hidden">
           <div className="grid m-3 grid-cols-4 gap-4 text-center">
             {["DIAGNOSIS", "RIGHT", "LEFT", "BOTH"].map((h) => (
@@ -223,14 +198,13 @@ export default function Diagnosis({ onClose, onDataChange }) {
           ))}
         </div>
 
-        {/* Selected Diagnosis */}
         <div className="m-5 mt-10">
           <h1 className="text-2xl font-bold mb-3">SELECTED DIAGNOSIS</h1>
           <div className="rounded-lg bg-[#F7DACD] p-6 w-full space-y-6">
             {selectedList.map((item, idx) => (
               <div
                 key={idx}
-                className="rounded-lg  p-6 flex flex-col md:flex-row gap-6 items-center justify-between"
+                className="rounded-lg p-6 flex flex-col md:flex-row gap-6 items-center justify-between"
               >
                 <div className="flex-1">
                   <h2 className="font-semibold text-lg mb-2">Diagnosis</h2>
@@ -260,7 +234,6 @@ export default function Diagnosis({ onClose, onDataChange }) {
           </div>
         </div>
 
-        {/* Doctor Comments */}
         <div className="m-5">
           <h1 className="font-semibold mb-5 text-2xl">DOCTOR COMMENTS</h1>
           <div className="space-y-8">
@@ -279,7 +252,6 @@ export default function Diagnosis({ onClose, onDataChange }) {
           </div>
         </div>
 
-        {/* Buttons */}
         <div className="flex flex-col sm:flex-row justify-center gap-6 mt-10 mb-10">
           <button
             onClick={handleReset}

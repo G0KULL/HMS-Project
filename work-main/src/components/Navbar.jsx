@@ -72,7 +72,7 @@ export default function Navbar() {
             >
               <button
                 onClick={() => {
-                  navigate("/Userprofile");
+                  navigate("/profile");
                   setOpen(false);
                 }}
                 className="flex items-center gap-2 w-full text-left px-4 py-2 text-gray-700 hover:bg-[#7E4363]/10 hover:text-[#7E4363]"

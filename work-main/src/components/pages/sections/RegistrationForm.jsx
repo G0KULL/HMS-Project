@@ -311,7 +311,7 @@ const handleSubmit = async (e) => {
   // Check if token exists
   if (!token) {
     alert("❌ You must be logged in to create an appointment.");
-    navigate("/login");
+    navigate("/");
     return;
   }
 

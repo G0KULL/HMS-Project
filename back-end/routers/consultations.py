@@ -2,14 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 import schemas, crud, models
 from database import get_db
+from auth import get_current_user
 
 
 router = APIRouter(prefix="/consultations", tags=["Consultations"])
 
 # ✅ Create consultation
 @router.post("/", response_model=schemas.ConsultationResponse)
-def create_consultation(consultation: schemas.ConsultationCreate, db: Session = Depends(get_db)):
-    return crud.create_consultation(db, consultation)
+def create_consultation(consultation: schemas.ConsultationCreate, db: Session = Depends(get_db),current_user=Depends(get_current_user)):
+    print("helloo")
+    return crud.create_consultation(db, consultation,current_user)
 
 # ✅ Get all consultations
 @router.get("/", response_model=list[schemas.ConsultationResponse])
