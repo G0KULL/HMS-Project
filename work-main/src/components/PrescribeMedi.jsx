@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Edit, Trash2, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import MedicinKit from "./Medicinkit";
+import Instruciton from "./Instruction";
 
 const PrescribeMedi = ({ onClose }) => {
   const [selectedHeader, setSelectedHeader] = useState("");
@@ -38,6 +41,9 @@ const PrescribeMedi = ({ onClose }) => {
     "NIGHT ONE TUBE",
   ];
 
+  const navigate = useNavigate();
+
+  // Make body unscrollable while modal is open
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -112,21 +118,34 @@ const PrescribeMedi = ({ onClose }) => {
     setMedicines(updated);
   };
 
+  // ✅ Robust close function
+  const close = () => {
+    if (typeof onClose === "function") {
+      onClose();
+    } else {
+      navigate(-1); // fallback if onClose is missing
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex justify-center items-start pt-20">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 backdrop-blur-sm bg-gray-200/30"
-        onClick={onClose}
+        className="absolute inset-0 backdrop-blur-sm bg-gray-200/30 z-0"
+        onClick={close} // uses robust close
       />
 
       {/* Modal content */}
-      <div className="relative z-10 w-full max-w-8xl p-6 bg-white rounded-2xl overflow-y-auto max-h-[90vh] space-y-6 shadow-lg">
+      <div
+        className="relative z-10 w-full max-w-8xl p-6 bg-white rounded-2xl overflow-y-auto max-h-[90vh] space-y-6 shadow-lg"
+        onClick={(e) => e.stopPropagation()} // prevent backdrop close
+      >
         {/* Header */}
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">PRESCRIBE MEDICINE</h1>
           <button
-            onClick={onClose}
+            type="button"
+            onClick={close} // robust close
             className="text-gray-600 hover:text-red-600 transition"
           >
             <X size={26} />
@@ -134,14 +153,18 @@ const PrescribeMedi = ({ onClose }) => {
         </div>
 
         {/* Tabs */}
-        <div className="flex flex-wrap gap-2 w-full max-w-3xl">
+        <div className="flex flex-wrap gap-2 w-full max-w-3xl mb-6">
           {headers.map((header) => (
             <div
               key={header}
-              onClick={() => setSelectedHeader(header)}
-              className={`flex-1 text-center px-4 py-2 cursor-pointer text-base md:text-xl font-semibold border rounded-full ${
+              onClick={() => {
+                setSelectedHeader(header);
+                if (header === "Kit") navigate("/MedicinKit");
+                if (header === "Special Instruction") navigate("/Instruction");
+              }}
+              className={`flex-1 text-center px-4 py-2 cursor-pointer text-base md:text-xl font-semibold border rounded-full transition-all ${
                 selectedHeader === header
-                  ? "bg-[#6D94C5] text-white"
+                  ? "bg-[#F7DACD] "
                   : "bg-white text-black"
               }`}
             >
@@ -149,12 +172,10 @@ const PrescribeMedi = ({ onClose }) => {
             </div>
           ))}
         </div>
-
         {/* Input Section */}
         <div className="p-6 bg-[#F7DACD] rounded-2xl space-y-6">
           {/* Row 1 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Category */}
             <div>
               <p className="font-semibold mb-1">CATEGORY</p>
               <select
@@ -169,8 +190,6 @@ const PrescribeMedi = ({ onClose }) => {
                 ))}
               </select>
             </div>
-
-            {/* Item Name */}
             <div>
               <p className="font-semibold mb-1">ITEM NAME</p>
               <input
@@ -180,8 +199,6 @@ const PrescribeMedi = ({ onClose }) => {
                 className="w-full bg-white rounded-full px-3 py-2"
               />
             </div>
-
-            {/* Dosage */}
             <div>
               <p className="font-semibold mb-1">DOSAGE</p>
               <select
@@ -239,13 +256,15 @@ const PrescribeMedi = ({ onClose }) => {
         {/* Buttons */}
         <div className="flex justify-end mt-4 space-x-4">
           <button
+            type="button"
             onClick={handleAddMedicine}
             className="bg-green-500 text-white px-6 py-2 rounded-full flex items-center gap-2 hover:bg-green-600 text-sm md:text-base"
           >
             {editIndex !== null ? "Update" : "Add"}
           </button>
           <button
-            onClick={onClose}
+            type="button"
+            onClick={close} // robust close
             className="bg-red-500 text-white px-6 py-2 rounded-full flex items-center gap-2 hover:bg-red-600 text-sm md:text-base"
           >
             Cancel
@@ -292,12 +311,14 @@ const PrescribeMedi = ({ onClose }) => {
                     <td className="px-4 py-2">{med.endDate}</td>
                     <td className="px-4 py-2 flex justify-center gap-3">
                       <button
+                        type="button"
                         onClick={() => handleEdit(index)}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         <Edit size={18} />
                       </button>
                       <button
+                        type="button"
                         onClick={() => handleDelete(index)}
                         className="text-red-600 hover:text-red-800"
                       >
@@ -310,8 +331,6 @@ const PrescribeMedi = ({ onClose }) => {
             </tbody>
           </table>
         </div>
-
-       
       </div>
     </div>
   );

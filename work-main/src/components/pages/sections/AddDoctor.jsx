@@ -6,7 +6,6 @@ import ISO6391 from "iso-639-1";
 import { FaFileUpload, FaTrashAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useParams, useNavigate } from "react-router-dom";
 
-
 export default function AddDoctor() {
   const [showDays, setShowDays] = useState(false);
   const [showTeleconsultation, setShowTeleconsultation] = useState(false);
@@ -83,10 +82,10 @@ export default function AddDoctor() {
       const fetchDoctor = async () => {
         try {
           const res = await fetch(`http://127.0.0.1:8000/doctors/${id}`, {
-  headers: {
-    Authorization: `Bearer ${token}`,  // ✅ add this
-  },
-});
+            headers: {
+              Authorization: `Bearer ${token}`, // ✅ add this
+            },
+          });
           if (!res.ok) throw new Error("Failed to fetch doctor");
           const data = await res.json();
           setFormData({
@@ -155,7 +154,11 @@ export default function AddDoctor() {
     // Contact/Phone
     if (!formData.contactNumber) {
       newErrors.contactNumber = "Contact number is required.";
-    } else if (!/^\+?\d{0,4}?[-\s()]?\d{6,15}$/.test(formData.contactNumber.replace(/\s+/g, ""))) {
+    } else if (
+      !/^\+?\d{0,4}?[-\s()]?\d{6,15}$/.test(
+        formData.contactNumber.replace(/\s+/g, "")
+      )
+    ) {
       newErrors.contactNumber = "Phone must be 10–15 digits.";
     }
 
@@ -171,25 +174,23 @@ export default function AddDoctor() {
 
   const [companies, setCompanies] = useState([]);
   const fetchCompanies = async () => {
-  try {
-    const response = await fetch("http://127.0.0.1:8000/companies/", {
-      headers: {
-        Authorization: `Bearer ${token}`,  // ✅ add this
-      },
-    });
-    if (!response.ok) throw new Error("Failed to fetch companies");
-    const data = await response.json();
-    setCompanies(data);
-  } catch (error) {
-    console.error("Error fetching companies:", error);
-  }
-};
-
+    try {
+      const response = await fetch("http://127.0.0.1:8000/companies/", {
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ add this
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch companies");
+      const data = await response.json();
+      setCompanies(data);
+    } catch (error) {
+      console.error("Error fetching companies:", error);
+    }
+  };
 
   useEffect(() => {
-  fetchCompanies();
-}, []);
-
+    fetchCompanies();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -275,13 +276,12 @@ export default function AddDoctor() {
       formData.append("file", file); // ✅ File object
 
       const res = await fetch("http://127.0.0.1:8000/patients/upload/", {
-  method: "POST",
-  headers: {
-    Authorization: `Bearer ${token}`, // ✅ add this
-  },
-  body: formData,
-});
-
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ add this
+        },
+        body: formData,
+      });
 
       if (!res.ok) {
         const text = await res.text();
@@ -349,58 +349,58 @@ export default function AddDoctor() {
     };
 
     try {
-  if (mode === "edit" && id) {
-    // 🔄 Update existing doctor + user
-    await fetch(`http://127.0.0.1:8000/users/${formData.user}`, {
-      method: "PUT",
-      headers: { 
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // ✅ add token here
-      },
-      body: JSON.stringify(userPayload),
-    });
+      if (mode === "edit" && id) {
+        // 🔄 Update existing doctor + user
+        await fetch(`http://127.0.0.1:8000/users/${formData.user}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ add token here
+          },
+          body: JSON.stringify(userPayload),
+        });
 
-    const doctorRes = await fetch(`http://127.0.0.1:8000/doctors/${id}`, {
-      method: "PUT",
-      headers: { 
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // ✅ add token here
-      },
-      body: JSON.stringify(doctorPayload),
-    });
+        const doctorRes = await fetch(`http://127.0.0.1:8000/doctors/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ add token here
+          },
+          body: JSON.stringify(doctorPayload),
+        });
 
-    if (!doctorRes.ok) throw new Error("Doctor update failed");
-    alert("✅ Doctor updated successfully!");
-  } else {
-    // 🆕 Create new doctor + user
-    const userRes = await fetch("http://127.0.0.1:8000/users/", {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // ✅ add token here
-      },
-      body: JSON.stringify(userPayload),
-    });
+        if (!doctorRes.ok) throw new Error("Doctor update failed");
+        alert("✅ Doctor updated successfully!");
+      } else {
+        // 🆕 Create new doctor + user
+        const userRes = await fetch("http://127.0.0.1:8000/users/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ add token here
+          },
+          body: JSON.stringify(userPayload),
+        });
 
-    if (!userRes.ok)
-      throw new Error(`User creation failed: ${userRes.status}`);
-    const userData = await userRes.json();
+        if (!userRes.ok)
+          throw new Error(`User creation failed: ${userRes.status}`);
+        const userData = await userRes.json();
 
-    const doctorRes = await fetch("http://127.0.0.1:8000/doctors/", {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // ✅ add token here
-      },
-      body: JSON.stringify({ ...doctorPayload, user: userPayload }),
-    });
+        const doctorRes = await fetch("http://127.0.0.1:8000/doctors/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ add token here
+          },
+          body: JSON.stringify({ ...doctorPayload, user: userPayload }),
+        });
 
-    if (!doctorRes.ok)
-      throw new Error(`Doctor creation failed: ${doctorRes.status}`);
-    alert("✅ Doctor created successfully!");
-    navigate("/doctors");
-  }
-} catch (error) {
+        if (!doctorRes.ok)
+          throw new Error(`Doctor creation failed: ${doctorRes.status}`);
+        alert("✅ Doctor created successfully!");
+        navigate("/doctors");
+      }
+    } catch (error) {
       console.error("❌ Error:", error);
       alert("Failed to save doctor. Check console for details.");
     }
@@ -482,6 +482,7 @@ export default function AddDoctor() {
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Personal Info */}
         <div className="bg-[#F7DACD] p-10 rounded-xl grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Row 1: Company, Full Name, Gender, DOB */}
           <div>
             <label className="block mb-1 font-medium">Company</label>
             <select
@@ -489,7 +490,7 @@ export default function AddDoctor() {
               value={formData.company_id}
               onChange={handleChange}
               disabled={isReadOnly}
-              className="w-full border p-3 rounded-lg"
+              className="w-full h-12 border p-3 rounded-lg"
             >
               <option value="">Select Company</option>
               {companies.map((c) => (
@@ -499,17 +500,16 @@ export default function AddDoctor() {
               ))}
             </select>
           </div>
+
           <div>
-            <label className="block text-1xl font-poppins text-gray-800 mb-1">
-              Full Name*
-            </label>
+            <label className="block mb-1 font-medium">Full Name*</label>
             <input
               type="text"
               name="fullName"
               value={formData.fullName}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="p-2 rounded-lg border w-full"
+              className="w-full h-12 p-3 border rounded-lg"
             />
             {errors.fullName && (
               <p className="text-red-600 text-sm mt-1">{errors.fullName}</p>
@@ -517,15 +517,13 @@ export default function AddDoctor() {
           </div>
 
           <div>
-            <label className="block text-1xl font-poppins text-gray-800 mb-1">
-              Gender*
-            </label>
+            <label className="block mb-1 font-medium">Gender*</label>
             <select
               name="gender"
               value={formData.gender}
               onChange={handleChange}
               disabled={isReadOnly}
-              className="p-2 rounded-lg border w-full"
+              className="w-full h-12 border p-3 rounded-lg"
             >
               <option value="">Select</option>
               <option value="Male">Male</option>
@@ -539,72 +537,63 @@ export default function AddDoctor() {
           </div>
 
           <div>
-            <label className="block text-1xl font-poppins text-gray-800 mb-1">
-              Date of Birth*
-            </label>
+            <label className="block mb-1 font-medium">Date of Birth*</label>
             <input
               type="date"
               name="dob"
               value={formData.dob}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="p-2 rounded-lg border w-full"
+              className="w-full h-12 p-3 border rounded-lg"
             />
           </div>
 
+          {/* Row 2: Registration No, Blood Group, Age, Contact Number */}
           <div>
-            <label className="block text-1xl font-poppins text-gray-800 mb-1">
-              Registration No.*
-            </label>
+            <label className="block mb-1 font-medium">Registration No.*</label>
             <input
               type="text"
               name="registrationNo"
               value={formData.registrationNo}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="p-2 rounded-lg border w-full"
+              className="w-full h-12 p-3 border rounded-lg"
             />
           </div>
 
           <div>
-            <label className="block text-1xl font-poppins text-gray-800 mb-1">
-              Blood Group*
-            </label>
+            <label className="block mb-1 font-medium">Blood Group*</label>
             <input
               type="text"
               name="bloodGroup"
               value={formData.bloodGroup}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="p-2 rounded-lg border w-full"
+              className="w-full h-12 p-3 border rounded-lg"
             />
           </div>
 
           <div>
-            <label className="block text-1xl font-poppins text-gray-800 mb-1">
-              Age*
-            </label>
+            <label className="block mb-1 font-medium">Age*</label>
             <input
               type="number"
               name="age"
               value={formData.age}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="p-2 rounded-lg border w-full"
+              className="w-full h-12 p-3 border rounded-lg"
             />
           </div>
 
           <div>
-            <label className="block text-1xl font-poppins text-gray-800 mb-1">
-              Contact Number*
-            </label>
+            <label className="block mb-1 font-medium">Contact Number*</label>
             <input
               type="text"
               name="contactNumber"
               value={formData.contactNumber}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="p-2 rounded-lg border w-full"
+              className="w-full h-12 p-3 border rounded-lg"
             />
             {errors.contactNumber && (
               <p className="text-red-600 text-sm mt-1">
@@ -613,8 +602,9 @@ export default function AddDoctor() {
             )}
           </div>
 
+          {/* Row 3: Education, Email, Address, Profile Photo */}
           <div>
-            <label className="block text-1xl font-poppins text-gray-800 mb-1">
+            <label className="block mb-1 font-medium">
               Educational Qualification*
             </label>
             <input
@@ -623,21 +613,19 @@ export default function AddDoctor() {
               value={formData.education}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="p-2 rounded-lg border w-full"
+              className="w-full h-12 p-3 border rounded-lg"
             />
           </div>
 
           <div>
-            <label className="block text-1xl font-poppins text-gray-800 mb-1">
-              Email Address*
-            </label>
+            <label className="block mb-1 font-medium">Email Address*</label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="p-2 rounded-lg border w-full"
+              className="w-full h-12 p-3 border rounded-lg"
             />
             {errors.email && (
               <p className="text-red-600 text-sm mt-1">{errors.email}</p>
@@ -645,23 +633,19 @@ export default function AddDoctor() {
           </div>
 
           <div>
-            <label className="block text-1xl font-poppins text-gray-800 mb-1">
-              Address*
-            </label>
+            <label className="block mb-1 font-medium">Address*</label>
             <textarea
               name="address"
               value={formData.address}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="w-60 h-20 p-2 rounded-lg border text-sm resize-none"
+              className="w-full h-12 p-3 border rounded-lg resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-1xl font-poppins text-gray-800 mb-1">
-              Profile Photo*
-            </label>
-            <label className="flex items-center justify-between w-60 h-20 px-3 border rounded-lg text-sm text-gray-600 cursor-pointer bg-white hover:bg-gray-100">
+            <label className="block mb-1 font-medium">Profile Photo*</label>
+            <label className="flex items-center justify-between w-full h-12 px-3 border rounded-lg text-sm text-gray-600 cursor-pointer bg-white hover:bg-gray-100">
               <span>Upload file</span>
               <FaUpload className="text-gray-500" />
               <input
@@ -669,9 +653,9 @@ export default function AddDoctor() {
                 name="profilePhoto"
                 accept=".png,.jpg,.jpeg,.pdf"
                 onChange={handleChange}
+                className="hidden"
               />
             </label>
-
             {formData.profilePhoto && (
               <p className="mt-2 text-sm text-gray-600">
                 {formData.profilePhoto.name}
@@ -679,84 +663,84 @@ export default function AddDoctor() {
             )}
           </div>
 
-          {/* Row 5: Password, Static IP, Status */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-            <div>
-              <label className="block mb-1 font-medium">Password*</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  readOnly={isReadOnly}
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#7E4363] outline-none pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-gray-500"
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
-              {formData.password && (
-                <p
-                  className={`mt-1 text-sm ${
-                    checkPasswordStrength(formData.password) === "Strong"
-                      ? "text-green-600"
-                      : checkPasswordStrength(formData.password) === "Medium"
-                      ? "text-yellow-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  Password Strength: {checkPasswordStrength(formData.password)}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium">Static IP</label>
+          {/* Row 4: Password, Static IP, Status */}
+          
+          <div>
+            <label className="block mb-1 font-medium">Password*</label>
+            <div className="relative">
               <input
-                type="text"
-                name="staticIP"
-                value={formData.staticIP}
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
                 onChange={handleChange}
                 readOnly={isReadOnly}
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#7E4363] outline-none"
+                className="w-full h-12 p-3 border rounded-lg focus:ring-2 focus:ring-[#7E4363] outline-none pr-10"
               />
-            </div>
-
-            {/* Status Toggle */}
-            <div>
-              <label className="block mb-1 font-medium">Status</label>
               <button
                 type="button"
-                onClick={handleToggle}
-                className={`relative inline-flex h-6 w-12 items-center rounded-full transition ${
-                  formData.status ? "bg-green-500" : "bg-gray-400"
-                }`}
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-3 text-gray-500"
               >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                    formData.status ? "translate-x-6" : "translate-x-1"
-                  }`}
-                />
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
-              <span
-                className={`ml-3 text-sm font-medium ${
-                  formData.status ? "text-green-700" : "text-gray-600"
+            </div>
+            {formData.password && (
+              <p
+                className={`mt-1 text-sm ${
+                  checkPasswordStrength(formData.password) === "Strong"
+                    ? "text-green-600"
+                    : checkPasswordStrength(formData.password) === "Medium"
+                    ? "text-yellow-600"
+                    : "text-red-600"
                 }`}
               >
-                {formData.status ? "Active" : "Inactive"}
-              </span>
-            </div>
+                Password Strength: {checkPasswordStrength(formData.password)}
+              </p>
+            )}
+          </div>
+
+          {/* Static IP */}
+          <div>
+            <label className="block mb-1 font-medium">Static IP</label>
+            <input
+              type="text"
+              name="staticIP"
+              value={formData.staticIP}
+              onChange={handleChange}
+              readOnly={isReadOnly}
+              className="w-full h-12 p-3 border rounded-lg focus:ring-2 focus:ring-[#7E4363] outline-none"
+            />
+          </div>
+
+          {/* Status Toggle */}
+          <div>
+            <label className="block mb-1 font-medium">Status</label>
+            <button
+              type="button"
+              onClick={handleToggle}
+              className={`relative inline-flex h-6 w-10 items-center rounded-full transition ${
+                formData.status ? "bg-green-500" : "bg-gray-400"
+              }`}
+            >
+              <span
+                className={`inline-block h-3 w-3 transform rounded-full bg-white transition ${
+                  formData.status ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </button>
+            <span
+              className={`ml-3 text-sm font-medium ${
+                formData.status ? "text-green-700" : "text-gray-600"
+              }`}
+            >
+              {formData.status ? "Active" : "Inactive"}
+            </span>
           </div>
         </div>
 
         {/* Professional Info */}
         <h2 className="text-4xl font-bold">Professional Information*</h2>
-        <div className="bg-[#F7DACD] p-10 rounded-xl grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-[#F7DACD] p-10 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-1xl font-poppins text-gray-800 mb-1">
               Specialization / Department*
@@ -767,10 +751,11 @@ export default function AddDoctor() {
               value={formData.specialization}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="w-60 h-20 p-2 rounded-lg border text-sm resize-none"
+              className="w-full h-12 p-2 rounded-lg border text-sm"
             />
           </div>
 
+          {/* Medical Registration Number */}
           <div>
             <label className="block text-1xl font-poppins text-gray-800 mb-1">
               Medical Registration Number*
@@ -781,10 +766,11 @@ export default function AddDoctor() {
               value={formData.licenseNo}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="w-60 h-20 p-2 rounded-lg border text-sm resize-none"
+              className="w-full h-12 p-2 rounded-lg border text-sm"
             />
           </div>
 
+          {/* Issuing Medical Council */}
           <div>
             <label className="block text-1xl font-poppins text-gray-800 mb-1">
               Issuing Medical Council*
@@ -795,10 +781,11 @@ export default function AddDoctor() {
               value={formData.issuingCouncil}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="w-60 h-20 p-2 rounded-lg border text-sm resize-none"
+              className="w-full h-12 p-2 rounded-lg border text-sm"
             />
           </div>
 
+          {/* Consultation Fee */}
           <div>
             <label className="block text-1xl font-poppins text-gray-800 mb-1">
               Consultation Fee*
@@ -809,10 +796,11 @@ export default function AddDoctor() {
               value={formData.consultationFee}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="w-60 h-20 p-2 rounded-lg border text-sm resize-none"
+              className="w-full h-12 p-2 rounded-lg border text-sm"
             />
           </div>
 
+          {/* Languages Spoken */}
           <div>
             <label className="block text-1xl font-poppins text-gray-800 mb-1">
               Languages Spoken*
@@ -821,22 +809,23 @@ export default function AddDoctor() {
               isMulti
               name="languages"
               options={languagesList}
-              className="w-60 text-sm"
+              className="w-full text-sm"
               classNamePrefix="select"
               value={formData.languages}
               onChange={(selected) =>
                 setFormData({ ...formData, languages: selected })
               }
               disabled={isReadOnly}
-              placeholder=" select languages..."
+              placeholder="Select languages..."
             />
           </div>
 
+          {/* Certifications (BLS/ACLS, etc.) */}
           <div>
             <label className="block text-1xl font-poppins text-gray-800 mb-1">
               Certifications (BLS/ACLS, etc.)*
             </label>
-            <label className="flex items-center justify-between w-60 h-20 px-3 border rounded text-sm text-gray-600 cursor-pointer bg-white hover:bg-gray-100">
+            <label className="flex items-center justify-between w-full h-12 px-3 border rounded text-sm text-gray-600 cursor-pointer bg-white hover:bg-gray-100">
               <span>Upload file</span>
               <FaUpload className="text-gray-500" />
               <input
@@ -848,7 +837,7 @@ export default function AddDoctor() {
                 className="hidden"
               />
             </label>
-            {/* Certifications */}
+            {/* Certifications list */}
             <div className="mt-2 space-y-1">
               {formData.certifications &&
                 Array.from(formData.certifications).map((file, index) => (
@@ -877,16 +866,13 @@ export default function AddDoctor() {
                   </div>
                 ))}
             </div>
-
-            {/* Experience Certificate */}
           </div>
         </div>
 
         {/* Work Experience */}
-        {/* ... similarly add years, previous hospital, designation, duration, awards, experienceCertificate ... */}
-        {/* Work Experience */}
         <h2 className="text-4xl font-bold">Work Experience*</h2>
-        <div className="bg-[#F7DACD] p-10 rounded-xl grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-[#F7DACD] p-10 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Total Years of Experience */}
           <div>
             <label className="block text-1xl font-poppins text-gray-800 mb-1">
               Total Years of Experience*
@@ -897,10 +883,11 @@ export default function AddDoctor() {
               value={formData.years}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="w-60 h-20 p-2 rounded-lg border text-sm resize-none"
+              className="w-full h-12 p-2 rounded-lg border text-sm"
             />
           </div>
 
+          {/* Previous Hospital / Organization */}
           <div>
             <label className="block text-1xl font-poppins text-gray-800 mb-1">
               Previous Hospital / Organization*
@@ -911,10 +898,11 @@ export default function AddDoctor() {
               value={formData.previous}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="w-60 h-20 p-2 rounded-lg border text-sm resize-none"
+              className="w-full h-12 p-2 rounded-lg border text-sm"
             />
           </div>
 
+          {/* Designation Held */}
           <div>
             <label className="block text-1xl font-poppins text-gray-800 mb-1">
               Designation Held*
@@ -925,10 +913,11 @@ export default function AddDoctor() {
               value={formData.Designation}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="w-60 h-20 p-2 rounded-lg border text-sm resize-none"
+              className="w-full h-12 p-2 rounded-lg border text-sm"
             />
           </div>
 
+          {/* Duration */}
           <div>
             <label className="block text-1xl font-poppins text-gray-800 mb-1">
               Duration*
@@ -939,10 +928,11 @@ export default function AddDoctor() {
               value={formData.Duration}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="w-60 h-20 p-2 rounded-lg border text-sm resize-none"
+              className="w-full h-12 p-2 rounded-lg border text-sm"
             />
           </div>
 
+          {/* Awards / Recognitions */}
           <div>
             <label className="block text-1xl font-poppins text-gray-800 mb-1">
               Awards / Recognitions*
@@ -953,14 +943,16 @@ export default function AddDoctor() {
               value={formData.awards}
               onChange={handleChange}
               readOnly={isReadOnly}
-              className="w-60 h-20 p-2 rounded-lg border text-sm resize-none"
+              className="w-full h-12 p-2 rounded-lg border text-sm"
             />
           </div>
+
+          {/* Upload Experience Certificate */}
           <div>
             <label className="block text-1xl font-poppins text-gray-800 mb-1">
               Upload Experience Certificate*
             </label>
-            <label className="flex items-center justify-between w-60 h-20 px-3 border rounded text-sm text-gray-600 cursor-pointer bg-white hover:bg-gray-100">
+            <label className="flex items-center justify-between w-full h-12 px-3 border rounded text-sm text-gray-600 cursor-pointer bg-white hover:bg-gray-100">
               <span>Upload file</span>
               <FaUpload className="text-gray-500" />
               <input
@@ -972,43 +964,43 @@ export default function AddDoctor() {
                 className="hidden"
               />
             </label>
-            {/* Certifications */}
+            {/* Uploaded Files */}
             <div className="mt-2 space-y-1">
               {formData.experienceCertificate &&
-                Array.from(formData.experienceCertificate).map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between bg-gray-50 p-2 rounded-md"
-                  >
-                    <span className="truncate text-sm text-gray-700">
-                      {file.name}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const updatedFiles = Array.from(
-                          formData.experienceCertificate
-                        ).filter((_, i) => i !== index);
-                        setFormData((prev) => ({
-                          ...prev,
-                          experienceCertificate: updatedFiles,
-                        }));
-                      }}
-                      className="text-red-500 hover:text-red-700 text-sm"
+                Array.from(formData.experienceCertificate).map(
+                  (file, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between bg-gray-50 p-2 rounded-md"
                     >
-                      <FaTrashAlt />
-                    </button>
-                  </div>
-                ))}
+                      <span className="truncate text-sm text-gray-700">
+                        {file.name}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updatedFiles = Array.from(
+                            formData.experienceCertificate
+                          ).filter((_, i) => i !== index);
+                          setFormData((prev) => ({
+                            ...prev,
+                            experienceCertificate: updatedFiles,
+                          }));
+                        }}
+                        className="text-red-500 hover:text-red-700 text-sm"
+                      >
+                        <FaTrashAlt />
+                      </button>
+                    </div>
+                  )
+                )}
             </div>
-
           </div>
-          
         </div>
 
         {/* Availability */}
         <h2 className="text-4xl font-bold">Availability*</h2>
-        <div className="bg-[#F7DACD] p-10 h-80 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-[#F7DACD] p-10 h-40 rounded-xl grid grid-cols-1 md:grid-cols-3 gap-4">
           <DaysDropdown
             label="Available Days"
             section="availableDays"

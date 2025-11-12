@@ -1,56 +1,105 @@
 import React, { useState, useEffect } from "react";
-import Diagnosis from "./Diagnosis"; // Ensure correct path
-import Procedure from "./Procedure"; // Ensure correct path
-import OTCounselling from "./OtCounselling"; // Ensure correct path
-// import Treatment from "./Treatment"; 
+import Diagnosis from "./Diagnosis"; 
+import Procedure from "./Procedure";
+import OTCounselling from "./OtCounselling";
 import PrescribeMedi from "../components/PrescribeMedi";
+import Instruciton from "./Instruction";
+import MedicinKit from "./Medicinkit";
 
 const Details = ({ onChange }) => {
   const [openModal, setOpenModal] = useState(null);
-  const [medicineData, setMedicineData] = useState({
-  category: "",
-  itemName: "",
-  dosage: "",
-  frequency: "",
-  duration: "",
-  route: "",
-  quantity: "",
-  start_date: "",
-  end_date: "",
-  kit: "",
-  instruction: "",
-});
 
-  
-  // Store data from child components
+  const [medicineData, setMedicineData] = useState({
+    category: "",
+    itemName: "",
+    dosage: "",
+    frequency: "",
+    duration: "",
+    route: "",
+    quantity: "",
+    start_date: "",
+    end_date: "",
+    kit: "",
+    instruction: "",
+  });
+
   const [diagnosisData, setDiagnosisData] = useState({
-    diagnosisList: [], // List of {condition, eye}
+    diagnosisList: [],
     doctorComments: { LE: "", RE: "" },
   });
   
   const [procedureData, setProcedureData] = useState({
-    procedureList: [], // List of {name, eye, remarks?, amount?}
+    procedureList: [],
     doctorComments: { LE: "", RE: "" },
   });
   
   const [otCounsellingData, setOtCounsellingData] = useState({
-    otCounsellingList: [], // List of {procedure_name, eye, remarks?, consent?}
+    otCounsellingList: [],
   });
 
   // Combine all data and notify parent
   useEffect(() => {
     if (onChange) {
-      const combinedData = {
+      onChange({
         diagnosisList: diagnosisData.diagnosisList || [],
         diagnosisComments: diagnosisData.doctorComments || { LE: "", RE: "" },
         procedureList: procedureData.procedureList || [],
         procedureComments: procedureData.doctorComments || { LE: "", RE: "" },
         otCounsellingList: otCounsellingData.otCounsellingList || [],
         medicineData: medicineData,
-      };
-      onChange(combinedData);
+      });
     }
-  }, [diagnosisData, procedureData, otCounsellingData,medicineData, onChange]);
+  }, [diagnosisData, procedureData, otCounsellingData, medicineData, onChange]);
+
+  // Function to render the correct modal
+  const renderModal = () => {
+    switch (openModal) {
+      case "diagnosis":
+        return (
+          <Diagnosis
+            onClose={() => setOpenModal(null)}
+            onDataChange={(data) => setDiagnosisData(data)}
+          />
+        );
+      case "procedure":
+        return (
+          <Procedure
+            onClose={() => setOpenModal(null)}
+            onDataChange={(data) => setProcedureData(data)}
+          />
+        );
+      case "ot":
+        return (
+          <OTCounselling
+            onClose={() => setOpenModal(null)}
+            onDataChange={(data) => setOtCounsellingData(data)}
+          />
+        );
+      case "treatment":
+        return (
+          <PrescribeMedi
+            onClose={() => setOpenModal(null)}
+            onDataChange={(data) => setMedicineData(data)}
+          />
+        );
+      case "kit":
+        return (
+          <MedicinKit
+            onClose={() => setOpenModal(null)}
+            onDataChange={(data) => setMedicineData(data)}
+          />
+        );
+      case "instruction":
+        return (
+          <Instruciton
+            onClose={() => setOpenModal(null)}
+            onDataChange={(data) => setMedicineData(data)}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="p-6 space-y-12">
@@ -130,7 +179,7 @@ const Details = ({ onChange }) => {
           className="bg-[#F7DACD] rounded-lg shadow p-6 cursor-pointer"
           onClick={() => setOpenModal("ot")}
         >
-          <div className="grid grid-cols-1 md:h-[200px]  md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:h-[200px] md:grid-cols-2 gap-6">
             <div>
               <h2 className="text-[32px]">Surgery Name</h2>
               <input 
@@ -181,51 +230,20 @@ const Details = ({ onChange }) => {
         </div>
       </div>
 
-      {/* ================= POPUPS ================= */}
-      {openModal === "diagnosis" && (
+      {/* ================= MODAL POPUP ================= */}
+      {openModal && (
         <div className="fixed inset-0 z-50 flex justify-center items-start pt-20">
-          <div className="absolute inset-0 backdrop-blur-sm bg-gray-200/30" onClick={() => setOpenModal(null)} />
-          <div className="relative z-10 w-11/12 max-w-7xl">
-            <Diagnosis 
-              onClose={() => setOpenModal(null)} 
-              onDataChange={(data) => setDiagnosisData(data)}
-            />
-          </div>
-        </div>
-      )}
-
-      {openModal === "procedure" && (
-        <div className="fixed inset-0 z-50 flex justify-center items-start pt-20">
-          <div className="absolute inset-0 backdrop-blur-sm bg-gray-200/30" onClick={() => setOpenModal(null)} />
-          <div className="relative z-10 w-11/12 max-w-7xl">
-            <Procedure 
-              onClose={() => setOpenModal(null)} 
-              onDataChange={(data) => setProcedureData(data)}
-            />
-          </div>
-        </div>
-      )}
-
-      {openModal === "ot" && (
-        <div className="fixed inset-0 z-50 flex justify-center items-start pt-20">
-          <div className="absolute inset-0 backdrop-blur-sm bg-gray-200/30" onClick={() => setOpenModal(null)} />
-          <div className="relative z-10 w-11/12 max-w-7xl">
-            <OTCounselling 
-              onClose={() => setOpenModal(null)} 
-              onDataChange={(data) => setOtCounsellingData(data)}
-            />
-          </div>
-        </div>
-      )}
-
-      {openModal === "treatment" && (
-        <div className="fixed inset-0 z-50 flex justify-center items-start pt-20">
-          <div className="absolute inset-0 backdrop-blur-sm bg-gray-200/30" onClick={() => setOpenModal(null)} />
-          <div className="relative z-10 w-11/12 max-w-7xl">
-            <PrescribeMedi 
-            onClose={() => setOpenModal(null)}
-            onDataChange={(data) => setMedicineData(data)} 
-            />
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 backdrop-blur-sm bg-gray-200/30"
+            onClick={() => setOpenModal(null)}
+          />
+          {/* Modal content */}
+          <div
+            className="relative z-10 w-11/12 max-w-7xl"
+            onClick={(e) => e.stopPropagation()} // Prevent click inside from closing
+          >
+            {renderModal()}
           </div>
         </div>
       )}

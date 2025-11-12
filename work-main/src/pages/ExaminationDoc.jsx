@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Subima from "../assets/subima.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Eye from "../components/Eye";
@@ -8,6 +8,7 @@ import { FiRefreshCw } from "react-icons/fi";
 import { FaCheckCircle } from "react-icons/fa";
 
 const PatientInfo = () => {
+  // 🔹 State hooks (must always be at top)
   const [showPopup, setShowPopup] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,16 +16,96 @@ const PatientInfo = () => {
   const [doctorName, setDoctorName] = useState("-");
   const [latestOptometry, setLatestOptometry] = useState(null);
 
-  const location = useLocation();
-  const navigate = useNavigate();
-  const navState = location.state || {};
-
   const [detailsData, setDetailsData] = useState({});
   const [followUpData, setFollowUpData] = useState({});
 
+  // 🔹 Router & API setup
+  const location = useLocation();
+  const navigate = useNavigate();
+  const navState = location.state || {};
   const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
   const token = localStorage.getItem("token");
 
+  // ✅ FIX: Hooks must come before any conditional returns
+  const handleDetailsChange = useCallback((data) => {
+    setDetailsData(data);
+  }, []);
+
+  const handleFollowUpChange = useCallback((data) => {
+    setFollowUpData(data);
+  }, []);
+
+  // 🔹 Fetch patient + optometry data from backend
+  useEffect(() => {
+    const fetchPatientData = async () => {
+      setLoading(true);
+      setError(null);
+
+      if (!token) {
+        setError("Authentication token not found");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const appointment = navState.appointment;
+        if (!appointment?.id) throw new Error("No appointment data found");
+
+        // ✅ Fetch optometry records
+        const res = await fetch(`${API_BASE}/optometrys/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch optometry records");
+
+        const allRecords = await res.json();
+        const appointmentRecords = Array.isArray(allRecords)
+          ? allRecords.filter((r) => r.appointment_id === appointment.id)
+          : [];
+
+        if (appointmentRecords.length > 0) {
+          appointmentRecords.sort((a, b) => (b.id || 0) - (a.id || 0));
+          setLatestOptometry(appointmentRecords[0]);
+        }
+
+        setPatientData(appointment);
+
+        // ✅ Fetch doctor name
+        if (appointment.doctor_id) {
+          const doctorRes = await fetch(`${API_BASE}/doctors/${appointment.doctor_id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (doctorRes.ok) {
+            const doctorData = await doctorRes.json();
+            setDoctorName(doctorData.full_name || doctorData.name || "-");
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPatientData();
+  }, [navState.appointment?.id, token, API_BASE]);
+
+  // 🔹 Conditional rendering (AFTER all hooks)
+  if (loading)
+    return (
+      <div className="text-blue-600 font-semibold flex items-center justify-center gap-2 h-screen">
+        Loading patient data... <FiRefreshCw className="animate-spin" />
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="text-red-600 font-semibold flex items-center justify-center h-screen">
+        Error: {error}
+      </div>
+    );
+
+  // 🔹 Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -132,77 +213,18 @@ const PatientInfo = () => {
     }
   };
 
+  // 🔹 Reset form
   const handleReset = () => {
     const form = document.querySelector("form");
     if (form) form.reset();
   };
 
-  useEffect(() => {
-    const fetchPatientData = async () => {
-      setLoading(true);
-      setError(null);
-
-      if (!token) {
-        setError("Authentication token not found");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const appointment = navState.appointment;
-        if (!appointment?.id) throw new Error("No appointment data found");
-
-        const res = await fetch(`${API_BASE}/optometrys/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Failed to fetch optometry records");
-        const allRecords = await res.json();
-
-        const appointmentRecords = Array.isArray(allRecords)
-          ? allRecords.filter((r) => r.appointment_id === appointment.id)
-          : [];
-
-        if (appointmentRecords.length > 0) {
-          appointmentRecords.sort((a, b) => (b.id || 0) - (a.id || 0));
-          setLatestOptometry(appointmentRecords[0]);
-        }
-
-        setPatientData(appointment);
-
-        if (appointment.doctor_id) {
-          const doctorRes = await fetch(`${API_BASE}/doctors/${appointment.doctor_id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (doctorRes.ok) {
-            const doctorData = await doctorRes.json();
-            setDoctorName(doctorData.full_name || doctorData.name || "-");
-          }
-        }
-      } catch (err) {
-        console.error(err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPatientData();
-  }, [location.state, token]);
-
-  if (loading)
-    return (
-      <div className="text-blue-600 font-semibold flex items-center justify-center gap-2 h-screen">
-        Loading patient data... <FiRefreshCw className="animate-spin" />
-      </div>
-    );
-
-  if (error)
-    return (
-      <div className="text-red-600 font-semibold flex items-center justify-center h-screen">
-        Error: {error}
-      </div>
-    );
-
+   const tabs = [
+    { label: "Readings", path: "/Reading" },
+    { label: "Examination", path: "/ExaminationDoc" },
+    { label: "Case History", path: "/CaseHistory" },
+    { label: "Draw", path: "/Draw" },
+  ];
   return (
     <form onSubmit={handleSubmit}>
       <div className="max-w-8xl mx-auto p-6 space-y-6">
@@ -234,42 +256,29 @@ const PatientInfo = () => {
           </div>
         )}
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-start space-x-4">
-          <Link
-            to="/Reading"
-            state={navState}
-            className="border px-8 py-2 rounded-full font-bold text-2xl hover:bg-[#F7DACD] hover:text-white transition"
-          >
-            Readings
-          </Link>
-          <Link
-            to="/ExaminationDoc"
-            state={navState}
-            className="border px-8 py-2 rounded-full font-bold text-2xl hover:bg-[#F7DACD] hover:text-white transition"
-          >
-            Examination
-          </Link>
-          <Link
-            to="/CaseHistory"
-            state={navState}
-            className="border px-8 py-2 rounded-full font-bold text-2xl hover:bg-[#F7DACD] hover:text-white transition"
-          >
-            Case History
-          </Link>
-          <Link
-            to="/Draw"
-            state={navState}
-            className="border px-8 py-2 rounded-full font-bold text-2xl hover:bg-[#F7DACD] hover:text-white transition"
-          >
-            Draw
-          </Link>
-        </div>
+       {/* Tabs */}
+      <div className="flex justify-start space-x-4">
+        {tabs.map((tab) => {
+          const isActive = location.pathname === tab.path;
+          return (
+            <p
+              key={tab.label}
+              onClick={() => navigate(tab.path, { state: navState })}
+              className={`border px-8 py-2 rounded-full font-bold text-2xl cursor-pointer transition
+                ${isActive ? "bg-[#F7DACD] text-white" : "hover:bg-[#F7DACD] hover:text-white"}`}
+            >
+              {tab.label}
+            </p>
+          );
+        })}
+      </div>
 
+        {/* Data Sections */}
         <Eye data={latestOptometry} />
-        <Details onChange={(data) => setDetailsData(data)} />
-        <FollowUp onChange={(data) => setFollowUpData(data)} />
+        <Details onChange={handleDetailsChange} />
+        <FollowUp onChange={handleFollowUpChange} />
 
+        {/* Buttons */}
         <div className="flex justify-end gap-4 mt-6">
           <button
             type="button"
@@ -286,6 +295,7 @@ const PatientInfo = () => {
           </button>
         </div>
 
+        {/* Success Popup */}
         {showPopup && (
           <div className="fixed inset-0 flex items-center justify-center bg-black/40">
             <div className="bg-white p-6 rounded-lg shadow-lg text-center w-[900px]">

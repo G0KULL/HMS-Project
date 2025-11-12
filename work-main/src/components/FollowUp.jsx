@@ -1,4 +1,3 @@
-// src/components/FollowUp.jsx
 import React, { useState, useEffect } from "react";
 
 export default function FollowUp({ onChange }) {
@@ -18,32 +17,25 @@ export default function FollowUp({ onChange }) {
 
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target;
-    setFormData((prev) => {
-      const updated = {
-        ...prev,
-        [name]: type === "checkbox" ? checked : value,
-      };
-      return updated;
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
-  // Notify parent whenever formData changes
   useEffect(() => {
-    if (onChange) {
+    if (typeof onChange === "function") {
       onChange(formData);
     }
-  }, [formData, onChange]);
+  }, [formData]); // safe dependency
 
   return (
     <div className="p-6">
-      {/* Heading */}
       <h1 className="text-2xl font-bold text-start inline-block bg-[#F7DACD] px-4 py-2 rounded-full mb-6">
         FOLLOW UP
       </h1>
 
-      <div
-        className="flex justify-center items-center py-10"
-      >
+      <div className="flex justify-center items-center py-10">
         <div className="w-full bg-[#F7DACD] p-6 rounded-lg shadow-md">
           {/* Next Visit Info */}
           <div className="grid grid-cols-4 gap-4 text-xl text-start mb-6">
@@ -102,49 +94,26 @@ export default function FollowUp({ onChange }) {
               </div>
 
               {/* Options */}
-              <label className="flex items-center gap-2 px-3 py-1 text-sm rounded-full bg-[#7E4363]  text-white font-medium shadow cursor-pointer hover:bg-green-600 transition">
-                <input
-                  type="checkbox"
-                  name="dilatation"
-                  checked={formData.dilatation}
-                  onChange={handleChange}
-                  className="w-4 h-4 accent-white"
-                />
-                <span>Dilatation</span>
-              </label>
-
-              <label className="flex items-center gap-2 px-3 py-1 text-sm rounded-full bg-[#7E4363]  text-white font-medium shadow cursor-pointer hover:bg-green-600 transition">
-                <input
-                  type="checkbox"
-                  name="rerefraction"
-                  checked={formData.rerefraction}
-                  onChange={handleChange}
-                  className="w-4 h-4 accent-white"
-                />
-                <span>Re refraction</span>
-              </label>
-
-              <label className="flex items-center gap-2 px-2 py-1 text-sm rounded-full bg-[#7E4363]  text-white font-medium shadow cursor-pointer hover:bg-green-600 transition">
-                <input
-                  type="checkbox"
-                  name="highRiskPatient"
-                  checked={formData.highRiskPatient}
-                  onChange={handleChange}
-                  className="w-4 h-4 accent-white"
-                />
-                <span>High risk patient</span>
-              </label>
-
-              <label className="flex items-center gap-2 px-3 py-1 text-sm rounded-full bg-[#7E4363]  text-white font-medium shadow cursor-pointer hover:bg-green-600 transition">
-                <input
-                  type="checkbox"
-                  name="fileClose"
-                  checked={formData.fileClose}
-                  onChange={handleChange}
-                  className="w-4 h-4 accent-white"
-                />
-                <span>File Close</span>
-              </label>
+              {[
+                { name: "dilatation", label: "Dilatation" },
+                { name: "rerefraction", label: "Re refraction" },
+                { name: "highRiskPatient", label: "High risk patient" },
+                { name: "fileClose", label: "File Close" },
+              ].map((item) => (
+                <label
+                  key={item.name}
+                  className="flex items-center gap-2 px-3 py-1 text-sm rounded-full bg-[#7E4363] text-white font-medium shadow cursor-pointer hover:bg-green-600 transition"
+                >
+                  <input
+                    type="checkbox"
+                    name={item.name}
+                    checked={formData[item.name]}
+                    onChange={handleChange}
+                    className="w-4 h-4 accent-white"
+                  />
+                  <span>{item.label}</span>
+                </label>
+              ))}
             </div>
           </div>
 
@@ -174,27 +143,23 @@ export default function FollowUp({ onChange }) {
           <div className="flex justify-end gap-6">
             <button
               type="button"
-              className="px-6 py-2 rounded-full bg-[#7E4363]  text-white hover:bg-green-600 transition"
+              className="px-6 py-2 rounded-full bg-[#7E4363] text-white hover:bg-green-600 transition"
               onClick={() => console.log("Load clicked")}
             >
               Load
             </button>
             <button
               type="button"
-              className="px-6 py-2 rounded-full bg-[#7E4363]  text-white hover:bg-green-600 transition"
+              className="px-6 py-2 rounded-full bg-[#7E4363] text-white hover:bg-green-600 transition"
               onClick={() => console.log("Save clicked", formData)}
             >
               Save
             </button>
             <button
-HEAD
-              type="submit"
-              className="px-6 py-2 rounded-full bg-[#7E4363]  text-white hover:bg-green-600 transition"
-
               type="button"
               className="px-6 py-2 rounded-full bg-[#48D56D] text-white hover:bg-green-600 transition"
-> origin/main
-            
+              onClick={() => console.log("Submit clicked", formData)}
+            >
               Submit
             </button>
           </div>
