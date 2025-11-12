@@ -2,24 +2,25 @@ import { Link } from "react-router-dom";
 
 const features = [
 
-   {name:"Company",icon:"/icons/Company.png",link:"/CompanyPage"},
+  {name:"Company",icon:"/icons/Company.png",link:"/CompanyPage"},
   {name:"User",icon:"/icons/user.png",link:"/UserPage"},
   { name: "Appointment", icon: "/icons/Appointment.png", link: "/appointment" },
-  { name: "Consultation", icon: "/icons/Analytics.png", link: "/Consultation" },
   { name: "Optometry", icon: "/icons/Optometry.png", link: "/ConsultList" },
+  { name: "Consultation", icon: "/icons/Consultation.png", link: "/Consultation" },
   { name: "Patients", icon: "/icons/Patients.png", link: "/patients" },
   { name: "Doctors", icon: "/icons/Doctors.png", link: "/doctors" },
   { name: "Pharmacy", icon: "/icons/Pharmacy.png", link: "/pharmacy" },
-  { name: "Bills", icon: "/icons/Bills.png", link: "/bills" },
   { name: "Opticals", icon: "/icons/Opticals.png", link: "/opticals" },
+  { name: "Bills", icon: "/icons/Bills.png", link: "/bills" },
   { name: "Insurance", icon: "/icons/Insurance.png", link: "/ForMailing" },
   { name: "Counsellor Desk", icon: "/icons/Counsellor-Desk.png", link: "/counsellor-desk" },
   { name: "Supplier", icon: "/icons/Supplier.png", link: "/SupplierTable" },
   { name: "Inventory", icon: "/icons/Inventory.png", link: "/InventoryMang" },
   {name: "Analytics", icon: "/icons/Analytics.png", link: "/Analytics"},
   {name: "Offers", icon: "/icons/OfferIcon.png", link: "/OfferPage"},
-   {name: "Profile", icon: "/icons/Profile.jpg", link: "/profile"},
-   {name: "Kitpage", icon: "/icons/kit.jpg", link: "/kitpage"},
+  {name: "Kitpage", icon: "/icons/kit.jpg", link: "/kitpage"},
+  {name: "Profile", icon: "/icons/Profile.jpg", link: "/profile"},
+
 ];
 
 const roleFeatures = {

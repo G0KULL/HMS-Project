@@ -43,7 +43,7 @@ export default function KitPage() {
               key={header}
               onClick={() => {
                 setSelectedHeader(header);
-                if (header === "Kit") navigate("/MedicinKit");
+                if (header === "Special instruction") navigate("/Instruction");
                 if (header === "Medicine") navigate("/PrescribeMedi");
               }}
               className={`flex-1 text-center px-4 py-2 cursor-pointer text-base md:text-xl font-semibold border rounded-full transition-all ${

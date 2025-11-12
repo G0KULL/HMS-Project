@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Edit, Trash2, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import MedicinKit from "./Medicinkit";
+import MedicinKit from "./MedicinKit";
 import Instruciton from "./Instruction";
 
 const PrescribeMedi = ({ onClose }) => {
@@ -160,7 +160,7 @@ const PrescribeMedi = ({ onClose }) => {
               onClick={() => {
                 setSelectedHeader(header);
                 if (header === "Kit") navigate("/MedicinKit");
-                if (header === "Special Instruction") navigate("/Instruction");
+                if (header === "Special instruction") navigate("/Instruciton");
               }}
               className={`flex-1 text-center px-4 py-2 cursor-pointer text-base md:text-xl font-semibold border rounded-full transition-all ${
                 selectedHeader === header

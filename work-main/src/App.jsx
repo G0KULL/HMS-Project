@@ -93,7 +93,7 @@ function App() {
         <Route path="/otCounselling" element={<OtCounselling />} />
         <Route path="/prescribeMedi" element={<PrescribeMedi />} />
         <Route path="/medicinKit" element={<MedicinKit />} />
-        <Route path="/instruction" element={<Instruciton />} />
+        <Route path="/Instruction" element={<Instruciton />} />
         <Route path="/CaseHistory" element={<CaseHistory />} />
         <Route path="/Draw" element={<Draw />} />
         <Route path="/ConsultList" element={<ConsultList />} />

@@ -250,47 +250,6 @@ const PatientInfo = () => {
         </div>
       )}
 
-      {patientData && (
-        <div className="bg-[#F7DACD] rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 font-medium text-2xl w-full md:w-2/3">
-            <p>
-              <span className="font-bold">Name:</span>{" "}
-              {patientData.fullName ||
-                patientData.full_name ||
-                patientData.name ||
-                "-"}
-            </p>
-            <p>
-              <span className="font-bold">Age:</span> {patientData.age || "-"}{" "}
-              YEARS
-            </p>
-            <p>
-              <span className="font-bold">Gender:</span>{" "}
-              {patientData.gender || "-"}
-            </p>
-            <p>
-              <span className="font-bold">MR Number:</span>{" "}
-              {patientData.custom_id || patientData.id || "-"}
-            </p>
-            <p>
-              <span className="font-bold">Visit Date:</span>{" "}
-              {patientData.visitDate || patientData.visit_date
-                ? new Date(
-                    patientData.visitDate || patientData.visit_date
-                  ).toLocaleDateString()
-                : "-"}
-            </p>
-            <p>
-              <span className="font-bold">Visit Type:</span>{" "}
-              {patientData.patient_type || "GENERAL CONSULTATION"}
-            </p>
-            <p>
-              <span className="font-bold">Doctor:</span> {doctorName}
-            </p>
-          </div>
-        </div>
-      )}
-
         {/* Patient Card */}
         {patientData && (
           <div className="bg-[#F7DACD] rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
@@ -324,8 +283,8 @@ const PatientInfo = () => {
               }
               className={`border px-8 py-2 rounded-full font-bold text-2xl cursor-pointer transition ${
                 isActive
-                  ? "bg-[#F7DACD] text-white"
-                  : "hover:bg-[#F7DACD] hover:text-white"
+                  ? "bg-[#F7DACD] "
+                  : "hover:bg-[#F7DACD] "
               }`}
             >
               {tab.label}
@@ -339,7 +298,7 @@ const PatientInfo = () => {
         <>
           <ArReading data={optometryData.arReading || {}} viewOnly />
           <Visual data={optometryData.visual || {}} viewOnly />
-          <Pog data={optometryData.pog || {}} viewOnly />
+          <Pog data={optometryData.pog || {}} />
           <Refraction data={optometryData.refraction || {}} viewOnly />
           <Retinoscopy data={optometryData.retinoscopy || {}} viewOnly />
           <Dialated data={optometryData.dialated || {}} viewOnly />

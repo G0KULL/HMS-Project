@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useCallback } from "react";
 import Diagnosis from "./Diagnosis"; 
 import Procedure from "./Procedure";
 import OTCounselling from "./OtCounselling";
 import PrescribeMedi from "../components/PrescribeMedi";
 import Instruciton from "./Instruction";
-import MedicinKit from "./Medicinkit";
+
+import MedicinKit from "./MedicinKit";
 
 const Details = ({ onChange }) => {
   const [openModal, setOpenModal] = useState(null);

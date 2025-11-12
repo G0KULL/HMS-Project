@@ -55,7 +55,7 @@ export default function Pog({ data = {}, onChange, viewOnly = false }) {
       {/* Title + Reset Button */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-3xl md:text-4xl font-bold bg-[#F7DACD] text-[#3E1E32] rounded-full px-6 py-2 inline-block shadow-sm">
-          POG
+          PG POWER
         </h2>
 
         {!viewOnly && (
