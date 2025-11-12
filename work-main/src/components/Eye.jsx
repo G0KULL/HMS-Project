@@ -1,7 +1,7 @@
 import React from "react";
 import { FiRefreshCw } from "react-icons/fi";
 
-const Eye = ({ data = {}, onChange, viewOnly = false  }) => {
+const Eye = ({ data = {}, onChange }) => {
   const testRows = [
     { label: "PUPIL", od: "pupil_od", os: "pupil_os" },
     { label: "CR", od: "cr_od", os: "cr_os" },
@@ -12,121 +12,124 @@ const Eye = ({ data = {}, onChange, viewOnly = false  }) => {
   ];
 
   const handleChange = (e) => {
-    if (viewOnly) return;
     const { name, value } = e.target;
     onChange({ ...data, [name]: value });
   };
 
   const handleReset = () => {
     const emptyData = {};
-    testRows.forEach(row => {
+    testRows.forEach((row) => {
       emptyData[row.od] = "";
       emptyData[row.os] = "";
     });
-    ["pmt", "duochrome", "dialated", "wfdt"].forEach(field => (emptyData[field] = ""));
+    ["pmt", "dialated", "duochrome", "wfdt"].forEach(
+      (field) => (emptyData[field] = "")
+    );
     onChange(emptyData);
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto relative">
-      {/* Header + Reset */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="px-6 py-2 bg-[#F7DACD] rounded-full text-2xl md:text-3xl font-bold">
-          EYE EXAM
-        </h1>
-        <button
-          onClick={handleReset}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-lg shadow-md"
-        >
-          <FiRefreshCw size={18} /> Reset
-        </button>
-      </div>
+    <div className="p-6 space-y-6 relative max-w-8xl mx-auto">
+      {/* Reset Button */}
+      <button
+        onClick={handleReset}
+        className="absolute top-4 right-4 flex items-center gap-2 bg-gray-700 hover:bg-gray-800 text-white px-3 py-1 rounded-md shadow-md"
+      >
+        <FiRefreshCw size={18} />
+        Reset
+      </button>
 
       {/* OD/OS Table */}
-      <div className="overflow-x-auto bg-[#F7DACD] p-6 rounded-xl shadow-md">
-        <table className="w-full border-collapse text-center min-w-[600px]">
-          <thead>
-            <tr>
-              <th className="px-3 py-2 bg-[#7E4363] text-white rounded-l-md">Test</th>
-              <th className="px-3 py-2 bg-[#7E4363] text-white">OD</th>
-              <th className="px-3 py-2 bg-[#7E4363] text-white rounded-r-md">OS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {testRows.map((row) => (
-              <tr key={row.label} className="border-b border-gray-300">
-                <td className="px-3 py-2 font-semibold bg-[#F7DACD]">{row.label}</td>
-                <td className="px-3 py-2">
-                  <input
-                    type="text"
-                    name={row.od}
-                    value={data[row.od] || ""}
-                    onChange={handleChange}
-                    disabled={viewOnly}
-                    className={`w-full h-11 p-2 rounded-md border text-center ${
-                            viewOnly
-                              ? "bg-gray-200 text-gray-700 cursor-not-allowed"
-                              : "bg-gray-50 text-black border-gray-200 focus:ring-2 focus:ring-[#7E4363] outline-none"
-                          }`}
-                  />
-                </td>
-                <td className="px-3 py-2">
-                  <input
-                    type="text"
-                    name={row.os}
-                    value={data[row.os] || ""}
-                    onChange={handleChange}
-                    disabled={viewOnly}
-                    className={`w-full h-11 p-2 rounded-md border text-center ${
-                            viewOnly
-                              ? "bg-gray-200 text-gray-700 cursor-not-allowed"
-                              : "bg-gray-50 text-black border-gray-200 focus:ring-2 focus:ring-[#7E4363] outline-none"
-                          }`}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="bg-[#F7DACD] mt-10 p-6 rounded-xl shadow-md relative overflow-x-auto">
+        {/* Column Headings */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <h2 className="text-xl md:w-[770px] sm:mr-9 sm:w-[350px] font-bold text-center bg-[#7E4363] text-white py-2 rounded-md">
+            OD
+          </h2>
+          <h2 className="text-xl md:ml-24 sm:w-[300px] md:w-[590px] font-bold text-center bg-[#7E4363] text-white py-2 rounded-md">
+            OS
+          </h2>
+        </div>
+
+        {/* Rows */}
+        <div className="grid grid-cols-[150px_1fr_1fr] gap-4 w-full">
+          {testRows.map((row) => (
+            <React.Fragment key={row.label}>
+              <div className="bg-[#7E4363] text-white font-semibold px-2 py-2 rounded-full text-center">
+                {row.label}
+              </div>
+
+              <input
+                type="text"
+                name={row.od}
+                value={data[row.od] || ""}
+                onChange={handleChange}
+                className="w-full p-2 rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
+              />
+
+              <input
+                type="text"
+                name={row.os}
+                value={data[row.os] || ""}
+                onChange={handleChange}
+                className="w-full p-2  rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
+              />
+            </React.Fragment>
+          ))}
+        </div>
       </div>
 
-      {/* Lower Inputs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {["pmt", "dialated"].map((field) => (
-          <div key={field} className="flex flex-col gap-2">
-            <label className="font-semibold">{field.replace("_", " ")}:</label>
+      {/* Lower Input Table */}
+      <div className="grid grid-cols-1 md:grid-cols-2 mt-10 gap-6">
+        {/* Left Column */}
+        <div className="space-y-4">
+          <div className="grid grid-cols-[150px_1fr] gap-4 items-center">
+            <div className="font-semibold px-2 py-2 rounded-full">PMT Needed:</div>
             <input
               type="text"
-              name={field}
-              value={data[field] || ""}
+              name="pmt"
+              value={data.pmt || ""}
               onChange={handleChange}
-              disabled={viewOnly}
-              className={`w-full h-11 p-2 rounded-md border text-center ${
-                            viewOnly
-                              ? "bg-gray-200 text-gray-700 cursor-not-allowed"
-                              : "bg-gray-50 text-black border-gray-200 focus:ring-2 focus:ring-[#7E4363] outline-none"
-                          }`}
+              className="w-full p-2 text-gray-400 rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
             />
           </div>
-        ))}
 
-        {["duochrome", "wfdt"].map((field) => (
-          <div key={field} className="flex flex-col gap-2">
-            <label className="font-semibold">{field.replace("_", " ")}:</label>
+          <div className="grid grid-cols-[150px_1fr] gap-4 items-center">
+            <div className="font-semibold px-2 py-2 rounded-full">Dialated:</div>
             <input
               type="text"
-              name={field}
-              value={data[field] || ""}
+              name="dialated"
+              value={data.dialated || ""}
               onChange={handleChange}
-              disabled={viewOnly}
-              className={`w-full h-11 p-2 rounded-md border text-center ${
-                            viewOnly
-                              ? "bg-gray-200 text-gray-700 cursor-not-allowed"
-                              : "bg-gray-50 text-black border-gray-200 focus:ring-2 focus:ring-[#7E4363] outline-none"
-                          }`}
+              className="w-full p-2 text-gray-400  rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
             />
           </div>
-        ))}
+        </div>
+
+        {/* Right Column */}
+        <div className="space-y-4">
+          <div className="grid grid-cols-[150px_1fr] gap-4 items-center">
+            <div className="font-semibold px-2 py-2 rounded-full">DuoChrome Test:</div>
+            <input
+              type="text"
+              name="duochrome"
+              value={data.duochrome || ""}
+              onChange={handleChange}
+              className="w-full p-2 text-gray-400  rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
+            />
+          </div>
+
+          <div className="grid grid-cols-[150px_1fr] gap-4 items-center">
+            <div className="font-semibold px-2 py-2 rounded-full">WFDT:</div>
+            <input
+              type="text"
+              name="wfdt"
+              value={data.wfdt || ""}
+              onChange={handleChange}
+              className="w-full p-2 text-gray-400 rounded focus:ring-2 focus:ring-[#7E4363] outline-none"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

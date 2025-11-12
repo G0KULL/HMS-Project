@@ -1,116 +1,93 @@
+// src/pages/KitPage.jsx
 import React, { useState } from "react";
+import { X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const MedicinKit = () => {
-  const [selectedHeader, setSelectedHeader] = useState("Medicine"); // default selected
+export default function KitPage() {
+  const [kit, setKit] = useState("");
+  const [selectedHeader, setSelectedHeader] = useState("Kit"); // ✅ Added missing state
+  const navigate = useNavigate();
+
+  const kitOptions = [
+    "Post-Op Kit",
+    "Glaucoma Kit",
+    "Dry Eye Kit",
+    "Cataract Kit",
+    "Surgical Kit",
+  ];
+
+  const handleSave = () => {
+    if (!kit) return alert("Please select a kit!");
+    alert(`Selected Kit: ${kit}`);
+    navigate(-1); // ✅ Go back after saving
+  };
+
   const headers = ["Medicine", "Kit", "Special instruction"];
 
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-8xl mx-auto">
-      {/* Header */}
-      <h1 className="text-xl md:text-2xl font-bold mb-4">PRESCRIBE MEDICINE</h1>
+    <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50 overflow-y-auto">
+      {/* Main container (wider) */}
+      <div className="bg-white rounded-2xl shadow-2xl p-10 w-[900px] relative animate-fadeIn">
+        {/* ❌ Close button */}
+        <button
+          onClick={() => navigate(-1)} // ✅ Go back to previous page
+          className="absolute top-4 right-4 text-gray-700 hover:text-black transition"
+        >
+          <X size={26} />
+        </button>
 
-      {/* Tabs */}
-      <div className="flex flex-wrap gap-2 w-full max-w-3xl">
-        {headers.map((header) => (
-          <div
-            key={header}
-            onClick={() => setSelectedHeader(header)}
-            className={`flex-1 text-center px-4 py-2 cursor-pointer text-base md:text-xl font-semibold border rounded-full
-              ${
+        {/* Tabs */}
+        <div className="flex flex-wrap gap-2 w-full max-w-3xl mb-6">
+          {headers.map((header) => (
+            <div
+              key={header}
+              onClick={() => {
+                setSelectedHeader(header);
+                if (header === "Kit") navigate("/MedicinKit");
+                if (header === "Medicine") navigate("/PrescribeMedi");
+              }}
+              className={`flex-1 text-center px-4 py-2 cursor-pointer text-base md:text-xl font-semibold border rounded-full transition-all ${
                 selectedHeader === header
-                  ? "bg-[#6D94C5] text-white"
+                  ? "bg-[#F7DACD]"
                   : "bg-white text-black"
-              }
-            `}
-          >
-            {header}
-          </div>
-        ))}
-      </div>
-
-      {/* Content Section */}
-      <div className="p-6">
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Diagnosis Section */}
-          <div className="w-full md:w-1/3 p-4 rounded bg-[#CBDCEB]">
-            <p className="font-semibold">
-              ALLERGIC CONJUNCTIVITIS <br />
-              ALLERGIC CONJUNCTIVITIS (1) <br />
-              FEVER <br />
-              FEVER KIT <br />
-              HEADACHE <br />
-              HEADACHE AGE (16-25YRS) <br />
-              HEADACHE AGE (26-60YRS) <br />
-              HEADACHE AGE (8-15YRS) <br />
-              KIT NAME <br />
-              TEST FAV <br />
-              TEST KIT
-            </p>
-          </div>
-
-          {/* Right Side Content */}
-          <div className="w-full md:w-2/3 overflow-x-auto">
-            {selectedHeader === "Medicine" && (
-              <div className="flex flex-col">
-                <table className="w-full rounded-lg">
-                  <thead className="bg-black text-white">
-                    <tr>
-                      <th className="px-4 py-3">MEDICINE</th>
-                      <th className="px-4 py-3">DOSAGE</th>
-                      <th className="px-4 py-3">DURATION</th>
-                      <th className="px-4 py-3">ROUTE</th>
-                      <th className="px-4 py-3">ROUTE DESC</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <tr key={i} className="text-center">
-                        <td className="px-4 py-3">COMBIPAT EYE DROPS</td>
-                        <td className="px-4 py-3">2 TIMES PER DAY</td>
-                        <td className="px-4 py-3">1 MONTH</td>
-                        <td className="px-4 py-3">BOTH EYES</td>
-                        <td className="px-4 py-3">BOTH EYES BOTH EYES</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {selectedHeader === "Kit" && (
-              <div className="p-4 bg-[#F0F0F0] rounded-lg">
-                <h2 className="font-bold mb-2">Kit Page Content</h2>
-                <p>
-                  Display all the kits here. You can list kit names, quantities,
-                  or any details you need for the prescription.
-                </p>
-              </div>
-            )}
-
-            {selectedHeader === "Special instruction" && (
-              <div className="p-4 bg-[#F0F0F0] rounded-lg">
-                <h2 className="font-bold mb-2">Special Instruction Page</h2>
-                <p>
-                  Enter any special instructions for the patient here, such as
-                  timing, combination notes, or cautions.
-                </p>
-              </div>
-            )}
-          </div>
+              }`}
+            >
+              {header}
+            </div>
+          ))}
         </div>
-      </div>
 
-      {/* Buttons (Right aligned) */}
-      <div className="flex justify-end gap-4 mt-4">
-        <button className="bg-green-500 text-white px-5 py-2 rounded-full hover:bg-green-600">
-          Print
-        </button>
-        <button className="bg-red-500 text-white px-5 py-2 rounded-full hover:bg-red-600">
-          Close
-        </button>
+        {/* Title */}
+        <h1 className="text-3xl font-bold mb-6 text-start text-gray-800">
+          Select Kit
+        </h1>
+
+        {/* 🔽 Kit Dropdown */}
+        <div className="w-full flex justify-start">
+          <select
+            value={kit}
+            onChange={(e) => setKit(e.target.value)}
+            className="w-[80%] border border-gray-300 rounded-lg p-4 text-lg focus:ring-2 focus:ring-[#7E4363] outline-none"
+          >
+            <option value="">Select a kit</option>
+            {kitOptions.map((k) => (
+              <option key={k} value={k}>
+                {k}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 💾 Save Button */}
+        <div className="flex justify-center mt-10">
+          <button
+            onClick={handleSave}
+            className="bg-gray-800 text-white px-12 py-3 rounded-full text-lg font-semibold hover:bg-black transition"
+          >
+            Save
+          </button>
+        </div>
       </div>
     </div>
   );
-};
-
-export default MedicinKit;
+}

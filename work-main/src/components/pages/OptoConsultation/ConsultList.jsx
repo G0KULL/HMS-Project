@@ -180,7 +180,7 @@ export default function DoctorWaitingList() {
             </thead>
             <tbody>
               {latestAppointments.map((p, i) => (
-                <tr key={i} className="bg-[#6D94C5] text-black hover:bg-[#5479A3] transition rounded-lg cursor-pointer">
+                <tr key={i} className="bg-[#7E4363] text-white transition rounded-lg cursor-pointer">
                   <td className="px-6 py-4" onClick={() => setSelectedPatient(p)}>{p.custom_id || `APPT-${p.id}`}</td>
                   <td className="px-6 py-4" onClick={() => setSelectedPatient(p)}>{p.fullName}</td>
                   <td className="px-6 py-4" onClick={() => setSelectedPatient(p)}>{p.age}</td>

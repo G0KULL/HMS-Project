@@ -1,5 +1,4 @@
-// src/components/FollowUp.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function FollowUp({ onChange }) {
   const [formData, setFormData] = useState({
@@ -37,6 +36,7 @@ export default function FollowUp({ onChange }) {
     console.log("Follow-up data saved:", formData);
     alert("Follow-up data saved!");
   };
+
 
   return (
     <div className="p-6">
@@ -173,7 +173,7 @@ export default function FollowUp({ onChange }) {
           <div className="flex justify-end gap-6">
             <button
               type="button"
-              className="px-6 py-2 rounded-full bg-[#48D56D] text-white hover:bg-green-600 transition"
+              className="px-6 py-2 rounded-full bg-[#7E4363] text-white hover:bg-green-600 transition"
               onClick={() => console.log("Load clicked")}
             >
               Load

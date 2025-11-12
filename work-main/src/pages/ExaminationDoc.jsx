@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Subima from "../assets/subima.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Eye from "../components/Eye";
@@ -8,6 +8,7 @@ import { FiRefreshCw } from "react-icons/fi";
 import { FaCheckCircle } from "react-icons/fa";
 
 const PatientInfo = () => {
+  // 🔹 State hooks (must always be at top)
   const [showPopup, setShowPopup] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,12 +18,13 @@ const PatientInfo = () => {
   const [consultationId, setConsultationId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [detailsData, setDetailsData] = useState({});
+  const [followUpData, setFollowUpData] = useState({});
+
+  // 🔹 Router & API setup
   const location = useLocation();
   const navigate = useNavigate();
   const navState = location.state || {};
-
-  const [detailsData, setDetailsData] = useState({});
-  const [followUpData, setFollowUpData] = useState({});
 
   const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
   const token = localStorage.getItem("token");
@@ -48,291 +50,13 @@ const PatientInfo = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (isSubmitting) {
-      console.log("Already submitting, please wait...");
-      return;
-    }
 
-    setIsSubmitting(true);
-  
-    try {
-      // Get required IDs
-      const companyId = [
-        patientData?.company_id,
-        patientData?.companyId,
-        latestOptometry?.company_id,
-        localStorage.getItem("company_id"),
-      ]
-        .map((v) => (v !== undefined && v !== null ? parseInt(v) : NaN))
-        .find((n) => !Number.isNaN(n)) ?? null;
-      
-      const userId = parseInt(localStorage.getItem("user_id") || "0");
-      const doctorId = [
-        patientData?.doctor_id,
-        patientData?.doctorId,
-        patientData?.doctor?.id,
-        latestOptometry?.doctor_id,
-        localStorage.getItem("doctor_id"),
-      ]
-        .map((v) => (v !== undefined && v !== null && v !== "" ? parseInt(v) : NaN))
-        .find((n) => !Number.isNaN(n)) ?? null;
-      const optometryId = latestOptometry?.id ? parseInt(latestOptometry.id) : null;
-      
-      // Validate required fields
-      // if (!companyId) {
-      //   alert("Missing company_id. Please ensure the appointment has a company_id.");
-      //   setIsSubmitting(false);
-      //   return;
-      // }
-      
-      if (!userId) {
-        alert("Missing user_id. Please log in again.");
-        setIsSubmitting(false);
-        return;
-      }
-      
-      // if (!doctorId || Number.isNaN(doctorId)) {
-      //   alert("Doctor ID is required. Please ensure the appointment has a valid doctor selected.");
-      //   setIsSubmitting(false);
-      //   return;
-      // }
-      
-      if (!optometryId) {
-        alert("Optometry record is required. Please complete the optometry reading first.");
-        setIsSubmitting(false);
-        return;
-      }
-      
-      // if (!followUpData.date) {
-      //   alert("Follow-up date is required.");
-      //   setIsSubmitting(false);
-      //   return;
-      // }
-      
-      // // Provide required date fields if backend expects them
-      // const todayStr = new Date().toISOString().split("T")[0];
-      // const startDate = followUpData?.startDate || patientData?.visitDate || todayStr;
-      // const endDate = followUpData?.endDate || followUpData?.date || patientData?.visitDate || todayStr;
-      
-      // Format lists
-      const diagnosisList = (detailsData.diagnosisList || []).map(item => ({
-        condition: item.condition || "",
-        eye: item.eye || "Both",
-      }));
-      
-      const procedureList = (detailsData.procedureList || []).map(item => ({
-        name: item.name || "",
-        eye: item.eye || "Both",
-        remarks: item.remarks || null,
-      }));
-      
-      const otCounsellingList = (detailsData.otCounsellingList || []).map(item => ({
-        procedure_name: item.procedure_name || "",
-        eye: item.eye || "Both",
-        remarks: item.remarks || null,
-        consent: item.consent || null,
-      }));
-      
-      // Build consultation data
-      // ✅ Build consultation data — doctor_id & company_id are now handled by backend
-// Helper to safely return a valid date string or null
-const safeDate = (val) => {
-  if (!val || typeof val !== "string" || val.trim() === "") return null;
-  return val;
-};
-
-const todayStr = new Date().toISOString().split("T")[0];
-
-const consultationData = {
-  patient_id: parseInt(patientData?.patient_id || patientData?.id),
-  appointment_id: parseInt(patientData?.id),
-  optometry_id: latestOptometry?.id ? parseInt(latestOptometry.id) : null,
-  user_id: parseInt(localStorage.getItem("user_id") || "0"),
-
-  followup_date: safeDate(followUpData.date) || todayStr,
-  start_date:  safeDate(patientData?.visitDate) || null ,
-  end_date: safeDate(patientData?.visitDate) || null,
-
-  nextVisit: followUpData.nextVisit || null,
-  usagePerDay: followUpData.usagePerDay || null,
-  transferOutside: followUpData.transferOutside || false,
-  outsideDetails: followUpData.outsideDetails || null,
-  dilatation: followUpData.dilatation || false,
-  rerefraction: followUpData.rerefraction || false,
-  highRiskPatient: followUpData.highRiskPatient || false,
-  fileClose: followUpData.fileClose || false,
-  additionalRemarks: followUpData.additionalRemarks || null,
-  highRiskRemarks: followUpData.highRiskRemarks || null,
-
-  diagnosis: (detailsData.diagnosisList || []).map(item => ({
-    condition: item.condition || "",
-    eye: item.eye || "Both",
-  })),
-  procedure: (detailsData.procedureList || []).map(item => ({
-    name: item.name || "",
-    eye: item.eye || "Both",
-    remarks: item.remarks || null,
-  })),
-  ot_counsil: (detailsData.otCounsellingList || []).map(item => ({
-    procedure_name: item.procedure_name || "",
-    eye: item.eye || "Both",
-    remarks: item.remarks || null,
-    consent: item.consent || null,
-  })),
-  ...detailsData.medicineData,
-};
-
-
-  
-      console.log("📤 Submitting consultation data:", consultationData);
-      
-      let res;
-      let url;
-      let method;
-      
-      // If consultation exists, UPDATE it
-      if (consultationId) {
-        console.log("🔄 Updating existing consultation:", consultationId);
-        url = `${API_BASE}/consultations/${consultationId}`;
-        method = "PUT";
-      } else {
-        // Otherwise, CREATE new consultation
-        console.log("✨ Creating new consultation");
-        url = `${API_BASE}/consultations/`;
-        method = "POST";
-      }
-      
-      res = await fetch(url, {
-        method: method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(consultationData),
-      });
-  
-      console.log("📡 Response status:", res.status);
-      
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error("❌ API Error:", errorData);
-        throw new Error(errorData.detail || "Failed to save consultation");
-      }
-  
-      const savedConsultation = await res.json();
-      console.log("✅ Consultation saved successfully:", savedConsultation);
-      
-      setConsultationId(savedConsultation.id);
-      
-      setShowPopup(true);
-      setTimeout(() => {
-        setShowPopup(false);
-        // Optionally navigate away or refresh
-        // navigate("/some-success-page");
-      }, 3000);
-      
-    } catch (err) {
-      console.error("❌ Submit error:", err);
-      alert(err.message || "Failed to save consultation");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleReset = () => {
-    if (window.confirm("Are you sure you want to reset all fields?")) {
-      setDetailsData({});
-      setFollowUpData({});
-      
-      // Reset form if it exists
-      const form = document.querySelector("form");
-      if (form) form.reset();
-    }
-  };
-
-  useEffect(() => {
-    const fetchPatientData = async () => {
-      setLoading(true);
-      setError(null);
-
-      if (!token) {
-        setError("Authentication token not found");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const appointment = navState.appointment;
-        if (!appointment?.id) throw new Error("No appointment data found");
-
-        // Check if consultation already exists
-        const existingConsultation = await checkExistingConsultation(appointment.id);
-        if (existingConsultation) {
-          console.log("📋 Found existing consultation:", existingConsultation.id);
-          setConsultationId(existingConsultation.id);
-          
-          // TODO: Pre-fill form with existing data if needed
-          // setDetailsData({ ... });
-          // setFollowUpData({ ... });
-        }
-
-        // Fetch optometry records
-        const res = await fetch(`${API_BASE}/optometrys/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Failed to fetch optometry records");
-        const allRecords = await res.json();
-
-        const appointmentRecords = Array.isArray(allRecords)
-          ? allRecords.filter((r) => r.appointment_id === appointment.id)
-          : [];
-
-        if (appointmentRecords.length > 0) {
-          appointmentRecords.sort((a, b) => (b.id || 0) - (a.id || 0));
-          setLatestOptometry(appointmentRecords[0]);
-        }
-
-        setPatientData(appointment);
-
-        // Fetch doctor name
-        const resolvedDoctorId = appointment.doctor_id || appointment.doctorId;
-        if (resolvedDoctorId) {
-          const doctorRes = await fetch(`${API_BASE}/doctors/${resolvedDoctorId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (doctorRes.ok) {
-            const doctorData = await doctorRes.json();
-            setDoctorName(doctorData.full_name || doctorData.name || "-");
-          }
-        }
-      } catch (err) {
-        console.error(err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPatientData();
-  }, [location.state, token, API_BASE]);
-
-  if (loading)
-    return (
-      <div className="text-blue-600 font-semibold flex items-center justify-center gap-2 h-screen">
-        Loading patient data... <FiRefreshCw className="animate-spin" />
-      </div>
-    );
-
-  if (error)
-    return (
-      <div className="text-red-600 font-semibold flex items-center justify-center h-screen">
-        Error: {error}
-      </div>
-    );
-
+   const tabs = [
+    { label: "Readings", path: "/Reading" },
+    { label: "Examination", path: "/ExaminationDoc" },
+    { label: "Case History", path: "/CaseHistory" },
+    { label: "Draw", path: "/Draw" },
+  ];
   return (
     <form onSubmit={handleSubmit}>
       <div className="max-w-8xl mx-auto p-6 space-y-6">
@@ -402,7 +126,7 @@ const consultationData = {
           </Link>
         </div>
 
-        {/* Eye Section */}
+        {/* Data Sections */}
         <Eye data={latestOptometry} />
 
         {/* Details Section */}
@@ -439,7 +163,7 @@ const consultationData = {
           </button>
         </div>
 
-        {/* Popup message */}
+        {/* Success Popup */}
         {showPopup && (
           <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg text-center w-[90%] max-w-[900px]">

@@ -95,34 +95,34 @@ const Company = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-800">Companies</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Companies</h1>
         <button
           onClick={() => navigate("/AddCompany")}
-          className="bg-[#7E4363] text-white px-4 py-2 rounded-lg hover:bg-[#9b5778]"
+          className="bg-[#7E4363] text-white text-xl px-4 py-4 rounded-lg hover:bg-[#9b5778]"
         >
           + Add Company
         </button>
       </div>
 
-      <table className="w-full bg-white shadow-md rounded-lg overflow-hidden text-left">
-        <thead className="bg-[#7E4363] text-white">
+      <table className="w-full bg-white  rounded-lg overflow-hidden text-left">
+        <thead className="bg-[#7E4363] text-xl  text-white">
           <tr>
-            <th className="px-6 py-3">ID</th>
-            <th className="px-6 py-3">Name</th>
-            <th className="px-6 py-3">Admin</th>
-            <th className="px-6 py-3">Phone</th>
-            <th className="px-6 py-3">Status</th>
-            <th className="px-6 py-3">Actions</th>
+            <th className="px-6 py-6">ID</th>
+            <th className="px-6 py-6">Name</th>
+            <th className="px-6 py-6">Admin</th>
+            <th className="px-6 py-6">Phone</th>
+            <th className="px-6 py-6">Status</th>
+            <th className="px-6 py-6">Actions</th>
           </tr>
         </thead>
         <tbody>
           {companies.map((c) => (
-            <tr key={c.id} className="border-b hover:bg-gray-100">
-              <td className="px-6 py-3">{c.id}</td>
-              <td className="px-6 py-3">{c.name}</td>
-              <td className="px-6 py-3">{c.admin}</td>
-              <td className="px-6 py-3">{c.phone}</td>
-              <td className="px-6 py-3">
+            <tr key={c.id} className="border-b text-lg hover:bg-gray-100">
+              <td className="px-6 py-6">{c.id}</td>
+              <td className="px-6 py-6">{c.name}</td>
+              <td className="px-6 py-6">{c.admin}</td>
+              <td className="px-6 py-6">{c.phone}</td>
+              <td className="px-6 py-6">
                 <label className="inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"

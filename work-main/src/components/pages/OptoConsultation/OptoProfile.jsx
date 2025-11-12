@@ -9,7 +9,7 @@ const OptoProfile = ({ patient, onClose }) => {
   if (!patient) return null; // Safety check
 
   return (
-    <div className="relative bg-[#6D94C5] w-[427px] max-w-full h-auto p-6 rounded-2xl flex flex-col items-center justify-center text-center shadow-xl">
+    <div className="relative bg-[#7E4363] w-[427px] max-w-full h-auto p-6 rounded-2xl flex flex-col items-center justify-center text-center shadow-xl">
       {/* Close Button */}
       <button
         className="absolute top-3 right-3 text-white hover:text-gray-200"

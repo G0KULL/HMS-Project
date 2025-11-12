@@ -188,25 +188,29 @@ if (!formData.phone) {
             </div>
 
             {/* Logo */}
-            <div>
-              <label className="block text-gray-600 mb-1">Company Logo</label>
-              {!viewOnly ? (
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleLogoChange}
-                  className="w-full outline-none"
-                />
-              ) : (
-                logoPreview && (
-                  <img
-                    src={logoPreview}
-                    alt="Logo Preview"
-                    className="h-16 w-16 object-cover rounded-full border mt-2"
-                  />
-                )
-              )}
-            </div>
+<div>
+  <label className="block text-gray-600 mb-1">Company Logo</label>
+
+  <div className="flex items-center border rounded-lg p-2 cursor-pointer bg-white">
+    {!viewOnly ? (
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleLogoChange}
+        className="w-full outline-none"
+      />
+    ) : (
+      logoPreview && (
+        <img
+          src={logoPreview}
+          alt="Logo Preview"
+          className="h-16 w-16 object-cover rounded-full border mt-2"
+        />
+      )
+    )}
+  </div>
+</div>
+
           </div>
 
           {/* Address */}
@@ -282,7 +286,6 @@ if (!formData.phone) {
               name="admin"
               value={formData.admin}
               onChange={handleChange}
-              // disabled={viewOnly}
               className="w-full border rounded-lg p-2"
               required
             >
@@ -319,8 +322,8 @@ if (!formData.phone) {
           </div>
 
           {/* Status */}
-          <div className="mb-4 flex items-center">
-            <label className="block text-gray-700 font-medium mb-1 mr-3">
+          <div className="flex flex-col ">
+            <label className="block text-gray-700  mb-1">
               Status
             </label>
             <label className="inline-flex items-center cursor-pointer">

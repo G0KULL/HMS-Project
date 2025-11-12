@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
-import Diagnosis from "./Diagnosis";
+import React, { useState, useEffect } from "react";
+import Diagnosis from "./Diagnosis"; 
 import Procedure from "./Procedure";
 import OTCounselling from "./OtCounselling";
 import PrescribeMedi from "../components/PrescribeMedi";
+import Instruciton from "./Instruction";
+import MedicinKit from "./Medicinkit";
 
 const Details = ({ onChange }) => {
   const [openModal, setOpenModal] = useState(null);
@@ -47,10 +49,68 @@ const Details = ({ onChange }) => {
   // 🔥 FIX: Only call onChange when data actually changes
   useEffect(() => {
     if (onChange) {
-      onChange(combinedData());
+
+      onChange({
+        diagnosisList: diagnosisData.diagnosisList || [],
+        diagnosisComments: diagnosisData.doctorComments || { LE: "", RE: "" },
+        procedureList: procedureData.procedureList || [],
+        procedureComments: procedureData.doctorComments || { LE: "", RE: "" },
+        otCounsellingList: otCounsellingData.otCounsellingList || [],
+        medicineData: medicineData,
+      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [diagnosisData, procedureData, otCounsellingData, medicineData]);
+  }, [diagnosisData, procedureData, otCounsellingData, medicineData, onChange]);
+
+  // Function to render the correct modal
+  const renderModal = () => {
+    switch (openModal) {
+      case "diagnosis":
+        return (
+          <Diagnosis
+            onClose={() => setOpenModal(null)}
+            onDataChange={(data) => setDiagnosisData(data)}
+          />
+        );
+      case "procedure":
+        return (
+          <Procedure
+            onClose={() => setOpenModal(null)}
+            onDataChange={(data) => setProcedureData(data)}
+          />
+        );
+      case "ot":
+        return (
+          <OTCounselling
+            onClose={() => setOpenModal(null)}
+            onDataChange={(data) => setOtCounsellingData(data)}
+          />
+        );
+      case "treatment":
+        return (
+          <PrescribeMedi
+            onClose={() => setOpenModal(null)}
+            onDataChange={(data) => setMedicineData(data)}
+          />
+        );
+      case "kit":
+        return (
+          <MedicinKit
+            onClose={() => setOpenModal(null)}
+            onDataChange={(data) => setMedicineData(data)}
+          />
+        );
+      case "instruction":
+        return (
+          <Instruciton
+            onClose={() => setOpenModal(null)}
+            onDataChange={(data) => setMedicineData(data)}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
 
   return (
     <div className="p-6 space-y-12">

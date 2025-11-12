@@ -521,393 +521,406 @@ const handleSubmit = async (e) => {
     <form onSubmit={handleSubmit} className="p-8 w-full mx-auto mt-6 space-y-8">
       {/* Section 1: Registration Details */}
       <div className="bg-[#F7DACD] p-6 rounded-xl shadow-sm">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">
-          Registration Details
-        </h2>
+  <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">
+    Registration Details
+  </h2>
 
-        <div className="flex flex-wrap items-center gap-4">
-          <label className="font-medium text-gray-700">Registration Date:</label>
-          <input
-            type="date"
-            name="registrationDate"
-            value={formData.registrationDate}
-            readOnly
-            className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400 bg-gray-100 cursor-not-allowed"
-          />
+  {/* All fields in one line */}
+  <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
+    {/* Registration Date */}
+    <div className="flex flex-col">
+      <label className="font-medium text-gray-700 mb-1">Registration Date:</label>
+      <input
+        type="date"
+        name="registrationDate"
+        value={formData.registrationDate}
+        readOnly
+        className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400 bg-gray-100 cursor-not-allowed w-full"
+      />
+    </div>
 
-          <label className="font-medium text-gray-700">Visit Date:</label>
-          <input
-            type="date"
-            name="visitDate"
-            value={formData.visitDate}
-            onChange={handleChange}
-            readOnly={mode === "view"}
-            className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400"
-          />
+    {/* Visit Date */}
+    <div className="flex flex-col">
+      <label className="font-medium text-gray-700 mb-1">Visit Date:</label>
+      <input
+        type="date"
+        name="visitDate"
+        value={formData.visitDate}
+        onChange={handleChange}
+        readOnly={mode === "view"}
+        className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400 w-full"
+      />
+    </div>
 
-          <div>
-  <label className="font-medium text-gray-700">Company:</label>
-  {userRole === "super_admin" ? (
-    <select
-      name="company_id"
-      value={formData.company_id}
-      onChange={handleChange}
+    {/* Company */}
+    <div className="flex flex-col">
+      <label className="font-medium text-gray-700 mb-1">Company:</label>
+      {userRole === "super_admin" ? (
+        <select
+          name="company_id"
+          value={formData.company_id}
+          onChange={handleChange}
+          disabled={mode === "view"}
+          className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400 bg-white w-full"
+        >
+          <option value="">-- Select Company --</option>
+          {companies.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <input
+          type="text"
+          value={userCompanyName || `Company ID: ${userCompanyId}`}
+          readOnly
+          className="border rounded-lg px-3 py-2 outline-none bg-gray-100 cursor-not-allowed w-full"
+        />
+      )}
+    </div>
+
+    {/* Doctor */}
+    <div className="flex flex-col">
+      <label className="font-medium text-gray-700 mb-1">Doctor:</label>
+      {doctorsLoading ? (
+        <div className="px-3 py-2">Loading...</div>
+      ) : doctorsError ? (
+        <div className="text-red-600 px-3 py-2">Failed to load</div>
+      ) : (
+        <select
+          name="doctorId"
+          value={formData.doctorId}
+          onChange={handleChange}
+          disabled={mode === "view" || readOnlyDoctor}
+          className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400 bg-white w-full"
+        >
+          <option value="">-- Select Doctor --</option>
+          {doctors.map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.user?.name ?? d.name ?? d.registration_no ?? `Doctor ${d.id}`}
+            </option>
+          ))}
+        </select>
+      )}
+    </div>
+
+    {/* UHID + Search */}
+    <div className="flex flex-col">
+      <label className="font-medium text-gray-700 mb-1">UHID No:</label>
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          name="uhid"
+          value={formData.uhid || ""}
+          onChange={handleChange}
+          onBlur={handleUhidSearch}
+          placeholder="Enter UHID and press Tab"
+          className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400 w-full"
+        />
+        <button
+          type="button"
+          onClick={handleUhidSearch}
+          className="bg-[#7E4363] text-white px-4 py-2 rounded-lg transition"
+        >
+          Search
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+      {/* Section 2: Patient Registration */}
+     <div className="bg-[#EFB79D82] p-8 rounded-xl shadow-sm w-full">
+  <h2 className="text-3xl font-bold text-gray-800 mb-6 pb-2 border-b">
+    Patient Registration
+  </h2>
+
+  {/* ================== Patient Information Section ================== */}
+  <div className="w-full space-y-8">
+    {/* 🔹 Personal Information */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full">
+      <SelectInput
+        label="Patient Type*"
+        name="patientType"
+        value={formData.patientType}
+        onChange={handleChange}
+        options={(() => {
+          const base = ["General", "Camp"];
+          if (offersLoading) return base;
+          if (offersError) return base;
+          const offerNames = (offers || []).map((o) => o.offer_name).filter(Boolean);
+          return [...base, ...offerNames];
+        })()}
+        disabled={mode === "view"}
+        bgColor="white"
+      />
+
+      <TextInput
+        label="Full Name*"
+        name="fullName"
+        value={formData.fullName}
+        onChange={handleChange}
+        readOnly={mode === "view"}
+        bgColor="white"
+        error={errors.fullName}
+      />
+
+      <SelectInput
+        label="Gender*"
+        name="gender"
+        value={formData.gender}
+        onChange={handleChange}
+        options={["Male", "Female", "Other", "Prefer Not"]}
+        disabled={mode === "view"}
+        bgColor="white"
+      />
+
+      <TextInput
+        label="Age"
+        name="age"
+        value={formData.age}
+        onChange={handleChange}
+        readOnly={mode === "view"}
+      />
+    </div>
+
+    {/* 🔹 Address and Contact */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full">
+      <TextInput
+        type="date"
+        label="Date of Birth*"
+        name="dob"
+        value={formData.dob}
+        onChange={handleChange}
+        readOnly={mode === "view"}
+        bgColor="white"
+      />
+
+      <TextInput
+        label="Address"
+        name="address1"
+        value={formData.address1}
+        onChange={handleChange}
+        readOnly={mode === "view"}
+      />
+
+      <div className="relative w-full">
+        <TextInput
+          label="Pin Code*"
+          name="pin"
+          value={formData.pin}
+          onChange={handleChange}
+          readOnly={mode === "view"}
+          maxLength={6}
+        />
+        {pincodeLoading && (
+          <div className="absolute right-3 top-9 text-blue-600 text-sm">
+            Loading...
+          </div>
+        )}
+      </div>
+
+      <TextInput
+        label="City*"
+        name="city"
+        value={formData.city}
+        onChange={handleChange}
+        readOnly={mode === "view" || pincodeLoading}
+      />
+
+      <TextInput
+        label="State*"
+        name="state"
+        value={formData.state}
+        onChange={handleChange}
+        readOnly={mode === "view" || pincodeLoading}
+      />
+
+      <TextInput
+        label="Mobile Number*"
+        name="mobile"
+        value={formData.mobile}
+        onChange={handleChange}
+        readOnly={mode === "view"}
+        error={errors.mobile}
+      />
+
+      <TextInput
+        label="Alternate Number"
+        name="alternateNumber"
+        value={formData.alternateNumber}
+        onChange={handleChange}
+        readOnly={mode === "view"}
+      />
+
+      <TextInput
+        label="Reference*"
+        name="reference"
+        value={formData.reference}
+        onChange={handleChange}
+        readOnly={mode === "view"}
+      />
+
+      <TextInput
+        label="Email"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        readOnly={mode === "view"}
+      />
+
+      
+    </div>
+
+    {/* 🔹 Aadhar + Validity */}
+    <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 gap-6 w-full">
+
+      <TextInput
+        label="Blood Group"
+        name="bloodGroup"
+        value={formData.bloodGroup}
+        onChange={handleChange}
+        readOnly={mode === "view"}
+      />
+      <TextInput
+        label="Aadhar No*"
+        name="aadhar"
+        value={formData.aadhar}
+        onChange={handleChange}
+        readOnly={mode === "view"}
+      />
+
+      <TextInput
+        label="Valid Upto*"
+        name="valid"
+        value={formData.valid}
+        onChange={handleChange}
+        readOnly={mode === "view"}
+      />
+    </div>
+
+
+    {/* ================== Separate Billing Section ================== */}
+<div className="bg-white mt-10 rounded-xl p-8 shadow-sm w-full">
+  <h3 className="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b">
+    Billing Details
+  </h3>
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    {["registrationFee", "consultationFee", "Discount", "totalAmount"].map((field) => (
+      <TextInput
+        key={field}
+        label={field.replace(/([A-Z])/g, " $1").trim()}
+        name={field}
+        type="number"
+        value={billing[field]}
+        onChange={handleBillingChange}
+        readOnly={mode === "view" || field === "totalAmount"}
+        bgColor="#F7DACD"
+      />
+    ))}
+
+    <SelectInput
+      label="Payment Method"
+      name="paymentMethod"
+      value={billing.paymentMethod}
+      onChange={handleBillingChange}
+      options={["Cash", "Credit Card", "Debit Card", "UPI", "Net Banking"]}
       disabled={mode === "view"}
-      className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400 bg-white"
-    >
-      <option value="">-- Select Company --</option>
-      {companies.map((c) => (
-        <option key={c.id} value={c.id}>
-          {c.name}
-        </option>
-      ))}
-    </select>
-  ) : (
-    <input
-      type="text"
-      value={userCompanyName || `Company ID: ${userCompanyId}`}
-      readOnly
-      className="border rounded-lg px-3 py-2 outline-none bg-gray-100 cursor-not-allowed"
     />
+  </div>
+
+  {/* 🔹 Conditional Payment Fields */}
+  {billing.paymentMethod === "Cash" && (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
+      <TextInput
+        label="Amount Paid"
+        name="amountPaid"
+        type="number"
+        value={billing.amountPaid || ""}
+        onChange={handleBillingChange}
+        readOnly={mode === "view"}
+        bgColor="#F7DACD"
+      />
+      <TextInput
+        label="Return Amount"
+        name="returnAmount"
+        type="number"
+        value={billing.returnAmount || ""}
+        onChange={handleBillingChange}
+        readOnly={mode === "view"}
+        bgColor="#F7DACD"
+      />
+      <TextInput
+        label="Transaction Date"
+        name="transactionDate"
+        type="date"
+        value={billing.transactionDate || ""}
+        onChange={handleBillingChange}
+        readOnly={mode === "view"}
+        bgColor="#F7DACD"
+      />
+    </div>
+  )}
+
+  {billing.paymentMethod && billing.paymentMethod !== "Cash" && (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
+      <TextInput
+        label="Transaction ID"
+        name="transactionId"
+        value={billing.transactionId || ""}
+        onChange={handleBillingChange}
+        readOnly={mode === "view"}
+        bgColor="#F7DACD"
+      />
+      <TextInput
+        label="Transaction Date"
+        name="transactionDate"
+        type="date"
+        value={billing.transactionDate || ""}
+        onChange={handleBillingChange}
+        readOnly={mode === "view"}
+        bgColor="#F7DACD"
+      />
+    </div>
   )}
 </div>
 
-          <label className="font-medium text-gray-700">Doctor:</label>
-          {doctorsLoading ? (
-            <div className="px-3 py-2">Loading...</div>
-          ) : doctorsError ? (
-            <div className="text-red-600 px-3 py-2">Failed to load</div>
-          ) : (
-            <select
-              name="doctorId"
-              value={formData.doctorId}
-              onChange={handleChange}
-              disabled={mode === "view" || readOnlyDoctor}
-              className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400 bg-white"
-            >
-              <option value="">-- Select Doctor --</option>
-              {doctors.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.user?.name ?? d.name ?? d.registration_no ?? `Doctor ${d.id}`}
-                </option>
-              ))}
-            </select>
-          )}
-
-          <div className="flex items-center gap-2">
-            <label className="font-medium text-gray-700">UHID No:</label>
-            <input
-              type="text"
-              name="uhid"
-              value={formData.uhid || ""}
-              onChange={handleChange}
-              onBlur={handleUhidSearch}
-              placeholder="Enter UHID and press Tab"
-              className="border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-orange-400 w-40"
-            />
-            <button
-              type="button"
-              onClick={handleUhidSearch}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-              Search
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Section 2: Patient Registration */}
-      <div className="bg-[#EFB79D82] p-8 rounded-xl shadow-sm">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6 pb-2 border-b">
-          Patient Registration
-        </h2>
-
-        <div className="w-full grid grid-cols-1 lg:grid-cols gap-8">
-          <div className="lg:col-span-8 space-y-6 w-full">
-            <div className="w-full grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-6">
-              <div className="space-y-6 w-full">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full">
-                  <SelectInput
-                    label="Patient Type*"
-                    name="patientType"
-                    value={formData.patientType}
-                    onChange={handleChange}
-                    options={(() => {
-                      const base = ["General", "Camp"];
-                      if (offersLoading) return base;
-                      if (offersError) return base;
-                      const offerNames = (offers || []).map((o) => o.offer_name).filter(Boolean);
-                      return [...base, ...offerNames];
-                    })()}
-                    disabled={mode === "view"}
-                    bgColor="white"
-                  />
-                  <TextInput
-                    label="Full Name*"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    readOnly={mode === "view"}
-                    bgColor="white"
-                    error={errors.fullName}
-                  />
-                  <SelectInput
-                    label="Gender*"
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleChange}
-                    options={["Male", "Female", "Other", "Prefer Not"]}
-                    disabled={mode === "view"}
-                    bgColor="white"
-                  />
-                  {errors.gender && <p className="text-red-600 text-sm mt-1">{errors.gender}</p>}
-                  <TextInput
-                    label="Age"
-                    name="age"
-                    value={formData.age}
-                    onChange={handleChange}
-                    readOnly={mode === "view"}
-                  />
-                  
-                  
-                </div>
-                
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
-                  
-                  <TextInput
-                    type="date"
-                    label="Date of Birth*"
-                    name="dob"
-                    value={formData.dob}
-                    onChange={handleChange}
-                    readOnly={mode === "view"}
-                    bgColor="white"
-                  />
-                  <TextInput
-                    label="Address"
-                    name="address1"
-                    value={formData.address1}
-                    onChange={handleChange}
-                    readOnly={mode === "view"}
-                  />
-                  <div className="relative">
-                    <TextInput
-                      label="Pin Code*"
-                      name="pin"
-                      value={formData.pin}
-                      onChange={handleChange}
-                      readOnly={mode === "view"}
-                      maxLength={6}
-                    />
-                    {pincodeLoading && (
-                      <div className="absolute right-3 top-9 text-blue-600 text-sm">
-                        Loading...
-                      </div>
-                    )}
-                  </div>
-                  <TextInput
-                    label="City*"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleChange}
-                    readOnly={mode === "view" || pincodeLoading}
-                  />
-                  
-                  <TextInput
-                    label="Mobile Number*"
-                    name="mobile"
-                    value={formData.mobile}
-                    onChange={handleChange}
-                    readOnly={mode === "view"}
-                    error={errors.mobile}
-                  />
-                  <TextInput
-                  label="Reference*"
-                  name="reference"
-                  value={formData.reference}
-                  onChange={handleChange}
-                  readOnly={mode === "view"}
-                />
-                  <TextInput
-                    label="Alternate Number"
-                    name="alternateNumber"
-                    value={formData.alternateNumber}
-                    onChange={handleChange}
-                    readOnly={mode === "view"}
-                  />
-                  
-                <TextInput
-                    label="Blood Group"
-                    name="bloodGroup"
-                    value={formData.bloodGroup}
-                    onChange={handleChange}
-                    readOnly={mode === "view"}
-                  />
-                  <TextInput
-                  label="Email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  readOnly={mode === "view"}
-                />
-                </div>
-              </div>
-
-              <div className="flex flex-col justify-center md:justify-end items-start w-full space-y-3">
-  
+    {/* 🔹 Buttons */}
+    <div className="flex justify-end gap-4 mt-6">
+      {mode === "view" ? (
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="bg-red-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700 transition"
+        >
+          Cancel
+        </button>
+      ) : (
+        <>
+          <button
+            type="submit"
+            className="bg-green-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-700 transition"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="bg-gray-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-700 transition"
+          >
+            Cancel
+          </button>
+        </>
+      )}
+    </div>
+  </div>
 </div>
 
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-              <div className="flex flex-col gap-4">
-                
-                
-                <TextInput
-                  label="State*"
-                  name="state"
-                  value={formData.state}
-                  onChange={handleChange}
-                  readOnly={mode === "view" || pincodeLoading}
-                />
-              </div>
 
-            </div>
-
-            <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="space-y-4 w-full">
-                <TextInput
-                  label="Aadhar No*"
-                  name="aadhar"
-                  value={formData.aadhar}
-                  onChange={handleChange}
-                  readOnly={mode === "view"}
-                />
-                
-                
-                
-                <TextInput
-                  label="Valid Upto*"
-                  name="valid"
-                  value={formData.valid}
-                  onChange={handleChange}
-                  readOnly={mode === "view"}
-                />
-
-                <div className="flex items-end gap-4 mt-4">
-                  {mode === "view" ? (
-                    <button
-                      type="button"
-                      onClick={() => navigate(-1)}
-                      className="bg-red-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700 transition"
-                    >
-                      Cancel
-                    </button>
-                  ) : (
-                    <>
-                      <button
-                        type="submit"
-                        className="bg-green-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-700 transition"
-                      >
-                        Save
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => navigate(-1)}
-                        className="bg-gray-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-700 transition"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {/* Billing Section */}
-              <div className="bg-white rounded-xl p-6 space-y-4 w-full">
-                <h3 className="text-lg font-semibold text-gray-700 pb-2">Billing Details</h3>
-
-                {["registrationFee", "consultationFee", "Discount", "totalAmount"].map((field) => (
-                  <TextInput
-                    key={field}
-                    label={field.replace(/([A-Z])/g, " $1").trim()}
-                    name={field}
-                    type="number"
-                    value={billing[field]}
-                    onChange={handleBillingChange}
-                    readOnly={mode === "view" || field === "totalAmount"}
-                    bgColor="#F7DACD"
-                  />
-                ))}
-
-                <SelectInput
-                  label="Payment Method"
-                  name="paymentMethod"
-                  value={billing.paymentMethod}
-                  onChange={handleBillingChange}
-                  options={["Cash", "Credit Card", "Debit Card", "UPI", "Net Banking"]}
-                  disabled={mode === "view"}
-                />
-
-                {billing.paymentMethod === "Cash" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <TextInput
-                      label="Amount Paid"
-                      name="amountPaid"
-                      type="number"
-                      value={billing.amountPaid || ""}
-                      onChange={handleBillingChange}
-                      readOnly={mode === "view"}
-                      bgColor="#F7DACD"
-                    />
-                    <TextInput
-                      label="Return Amount"
-                      name="returnAmount"
-                      type="number"
-                      value={billing.returnAmount || ""}
-                      onChange={handleBillingChange}
-                      readOnly={mode === "view"}
-                      bgColor="#F7DACD"
-                    />
-                    <TextInput
-                      label="Transaction Date"
-                      name="transactionDate"
-                      type="date"
-                      value={billing.transactionDate || ""}
-                      onChange={handleBillingChange}
-                      readOnly={mode === "view"}
-                      bgColor="#F7DACD"
-                    />
-                  </div>
-                )}
-
-                {billing.paymentMethod && billing.paymentMethod !== "Cash" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <TextInput
-                      label="Transaction ID"
-                      name="transactionId"
-                      value={billing.transactionId || ""}
-                      onChange={handleBillingChange}
-                      readOnly={mode === "view"}
-                      bgColor="#F7DACD"
-                    />
-                    <TextInput
-                      label="Transaction Date"
-                      name="transactionDate"
-                      type="date"
-                      value={billing.transactionDate || ""}
-                      onChange={handleBillingChange}
-                      readOnly={mode === "view"}
-                      bgColor="#F7DACD"
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+     
     </form>
   );
 }
